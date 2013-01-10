@@ -72,11 +72,11 @@ set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
 
 if has("win32")         " platform dependent
-  let $vimrc    = $VIM.'/_vimrc'
+  let $VIMRC    = $VIM.'/_vimrc'
   let $vimdata  = $VIM.'/vimdata'
   let bundle    = $VIM.'/.vim/bundle'
 else
-  let $vimrc    = $HOME.'/.vimrc'
+  let $VIMRC    = $HOME.'/.vimrc'
   let $vimdata  = $HOME.'/.vimdata'
   let bundle    = $HOME.'/.vim/bundle'
 endif
@@ -137,9 +137,9 @@ nmap <leader>w :w!<cr>
 nmap <leader>f :find<cr>
 
                         " fast sourcing and editing of the .vimrc
-map <leader>s :source $vimrc<cr>
-map <leader>e :e! $vimrc<cr>
-au! BufWritePost [\._]vimrc source $vimrc
+map <leader>s :source $VIMRC<cr>
+map <leader>e :e! $VIMRC<cr>
+au! BufWritePost [\._]vimrc source $VIMRC
 
 set pastetoggle=<F3>    " when pasting something in, don't indent
 set rtp+=$vimdata       " add this to rtp to satisfy getscript.vim
@@ -163,6 +163,7 @@ if has("gui_running")
 else
   colo desert
   set background=light
+  set t_Co=256          " for vim-powerline
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
