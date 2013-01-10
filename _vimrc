@@ -156,6 +156,8 @@ nmap <leader>fu :se ff=unix<cr>
 syntax enable           " enable syntax hl
 
 if has("gui_running")
+  set guioptions-=r
+  set guioptions-=L
   set guioptions-=T
   let psc_style='cool'
   let g:molokai_original = 0
