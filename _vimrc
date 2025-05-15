@@ -1,18 +1,10 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"   \\|//    _    _  ___  ______
-"    o o      \  /   /   /  /  /
-"     U        \/ __/_ _/ _/ _/_
-" by Leal - http://linxiao.net
-"
-" Description: vimrc with dozens of scripts, for linux/windows
-" Derive From: Amix - http://www.amix.dk/vim/vimrc.html
-"              MetaCosm - http://vi-improved.org/vimrc.php
-"              Sidney - http://www.afn.org/~afn39695/sidney.htm
-" Last Change: 2013-01-07
-" Maintainer:  Leal <linxiao.li AT gmail DOT com>
-" SVN Repo:    http://vimming.googlecode.com/
-" Version:     1.1301, since 1.0501
-"
+"   \\|//  leal <linxiao.li AT gmail>
+"    o o   version 1.2505, since 1.0501
+"     U    
+" Derive:  Amix - http://www.amix.dk/vim/vimrc.html
+"          MetaCosm - http://vi-improved.org/vimrc.php
+"          Sidney - http://www.afn.org/~afn39695/sidney.htm
 " Section:
 " ------------------------------------------------------------------
 "   *> General
@@ -27,33 +19,16 @@
 "   *> Buffer related
 "   *> Files and backups
 "   *> Text options
-"   *> Spell checking
 "   *> Plugin settings
-"   ------ *> taglist.vim
-"   ------ *> Others
-"   *> Cope
 "   *> Misc
 "
 " Usage:
 "   1. Create necessary folders and files.
-"      $vimdata      x:\vim\vimdata on windows, ~/.vimdata on linux
-"       |-- temp        dir to put swap files when :set swapfile
-"       |-- backup      dir to put backup files when :set backup
-"       |-- diary       dir to store calendar.vim's diaries
-"       |-- GetLatest   dir to store getscript.vim's downloads
-"       |     `-- GetLatestVimScripts.dat
-"       |-- _vim_fav_files       file to store favmenu.vim's items
-"       `-- _vim_mru_files       file to store mru.vim's items
-"
-"   2. Get your favorite scripts on www.vim.org thru getscript.vim.
-"
+"      $vimdata  x:\vim\vimdata on windows, ~/.vimdata on linux
+"   2. Get your favorite scripts thru vim-plug
 "   3. Get necessary utilities, especially on windows, such as:
 "      wget  - http://users.ugent.be/~bpuype/wget/
 "      ctags - http://ctags.sf.net/
-"
-"   4. If you find anything that you couldn't understand, do this:
-"      :h keyword OR :helpgrep keyword OR press K (<S-k>) over it.
-"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -72,59 +47,65 @@ set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
 
 if has("win32")         " platform dependent
-  let $VIMRC    = $VIM.'/_vimrc'
-  let $vimdata  = $VIM.'/vimdata'
-  let bundle    = $VIM.'/.vim/bundle'
+  let $VIMRC    = $HOME.'/_vimrc'
+  let $vimdata  = $HOME.'/vimfiles/data'
+  let plugged   = $HOME.'/vimfiles/plug'
+  "set renderoptions=type:directx,renmode:5,taamode:1
 else
   let $VIMRC    = $HOME.'/.vimrc'
-  let $vimdata  = $HOME.'/.vimdata'
-  let bundle    = $HOME.'/.vim/bundle'
+  let $vimdata  = $HOME.'/.vim/data'
+  let plugged   = $HOME.'/.vim/plug'
 endif
 
 filetype off
-exec 'set rtp+='.bundle.'/vundle'
 
-call vundle#rc(bundle)
+set encoding=utf-8
+lan mes zh_CN.utf-8     " for encoding=utf-8
 
-Bundle 'vundle'
-Bundle 'a.vim'
-Bundle 'taglist.vim'
-Bundle 'YankRing.vim'
-Bundle 'ervandew/supertab'
-Bundle 'tomasr/molokai'
-Bundle 'MarcWeber/vim-addon-mw-utils'
-Bundle 'tomtom/tlib_vim'
-Bundle 'honza/snipmate-snippets'
-Bundle 'garbas/vim-snipmate'
-Bundle 'kien/ctrlp.vim'
-Bundle 'Lokaltog/vim-powerline'
+set laststatus=2        " always show the status line
 
-let g:Powerline_enabled=1
+silent! call plug#begin(plugged)
+Plug 'junegunn/vim-easy-align'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-scripts/a.vim'
+Plug 'vim-scripts/YankRing.vim'
+Plug 'yegappan/taglist'
+Plug 'ervandew/supertab'
+Plug 'tomasr/molokai'
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'kien/ctrlp.vim'
+call plug#end()
 
-if g:Powerline_enabled
-  set encoding=utf-8
-  lan mes zh_CN.utf-8     " for encoding=utf-8
-  let g:Powerline_symbols = 'fancy'
+filetype plugin on      " enable filetype plugin
+filetype indent on
+
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#buffer_nr_show = 1
+
+if g:airline_powerline_fonts
   if has("win32")
-    try | set gfn=Consolas_for_Powerline_FixedD:h10:cANSI | catch | endtry
+    "try | set gfn=Source_Code_Pro_for_Powerline:h11:cANSI | catch | endtry
+    "try | set gfn=Sarasa_Term_SC:h11:cANSI:qDRAFT | catch | endtry
+    "try | set gfn=JetBrainsMono_NFM:h11:cANSI:qDRAFT | catch | endtry
+    "try | set gfw=Sarasa_Term_SC:h11:cGB2312 | catch | endtry
+    try | set gfn=Maple_Mono_NF:h11:cANSI:qDRAFT | catch | endtry
+    try | set gfw=Maple_Mono_NF_CN:h11:cGB2312 | catch | endtry
   else
     set gfn=Bitstream\ Vera\ Sans\ Mono\ 11
   endif
-  "highlight VertSplit ctermbg=234 ctermfg=234
 else
   set statusline=\ %F%m%r%h\ %w\ %{&ff}\ \ now:\ %r%{CurDir()}%h\ \ \ pos:\ %l/%L:%c
-	  " format the statusline
   if has("win32")
-    try | set gfn=Consolas:h10:cANSI | catch | endtry
+    try | set gfn=Consolas:h12:cANSI | catch | endtry
   else
     set gfn=Bitstream\ Vera\ Sans\ Mono\ 11
   endif
 endif
-
-set laststatus=2        " always show the status line
-
-filetype plugin on      " enable filetype plugin
-filetype indent on
 
 if $TERM != "linux" && $TERM != "screen"
   set mouse=a           " except screen & SecureCRT's linux terminal
@@ -139,10 +120,9 @@ nmap <leader>f :find<cr>
                         " fast sourcing and editing of the .vimrc
 map <leader>s :source $VIMRC<cr>
 map <leader>e :e! $VIMRC<cr>
-au! BufWritePost [\._]vimrc source $VIMRC
+"au! BufWritePost [\._]vimrc source $VIMRC
 
 set pastetoggle=<F3>    " when pasting something in, don't indent
-set rtp+=$vimdata       " add this to rtp to satisfy getscript.vim
 set path=.,/usr/include/*, " where gf, ^Wf, :find will search
 set tags=./tags,tags    " used by CTRL-] together with ctags
 set makeef=error.err    " the errorfile for :make and :grep
@@ -162,15 +142,25 @@ if has("gui_running")
   let psc_style='cool'
   let g:molokai_original = 0
   colo molokai
+  if v:version >= 700 " highlight cursor line/column
+    hi CursorLine guibg=#333333 
+    hi CursorColumn guibg=#333333
+  endif
 else
   colo desert
   set background=light
-  set t_Co=256          " for vim-powerline
+  set t_Co=256          " for vim-powerline or vim-airline
+endif
+
+if v:version >= 700     " popmenu color setting
+  hi Pmenu guibg=#333333
+  hi PmenuSel guibg=#555555 guifg=#ffffff
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Visual cues
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set cursorline
 set scrolloff=7         " minimal screen lines above/below cursor
 set wildmenu            " :h and press <Tab> to see what happens
 set wig=*.o,*.pyc       " type of file that will not in wildmenu
@@ -204,18 +194,6 @@ fu! CurDir()
   let curdir = tolower(substitute(getcwd(), '$HOME', "~/", "g"))
   return curdir
 endf
-
-if has("gui_running")   " highlight cursor line/column
-  if v:version >= 700
-    hi CursorLine guibg=#333333 
-    hi CursorColumn guibg=#333333
-  endif
-endif
-
-if v:version >= 700     " popmenu color setting
-  hi Pmenu guibg=#333333
-  hi PmenuSel guibg=#555555 guifg=#ffffff
-endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Visual search
@@ -413,8 +391,6 @@ endf
 " => Files and backups
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set nobackup
-"set backupdir=$vimdata/backup
-"set directory=$vimdata/temp
 set nowritebackup
 set noswapfile
 
@@ -434,47 +410,26 @@ set si                  " smartindent
 set cindent             " do C-style indenting
 set wrap                " wrap lines
 
-map <leader>t2 :set shiftwidth=2<cr>
-map <leader>t8 :set shiftwidth=8<cr>
 au FileType html,python,vim,javascript setl shiftwidth=2
 au FileType html,python,vim,javascript setl tabstop=2
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Spell checking
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map <leader>sn ]s
-map <leader>sp [s
-map <leader>sa zg
-map <leader>s? z=
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugin settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-  """"""""""""""""""""""""""""""
-  " => taglist.vim
-  """"""""""""""""""""""""""""""
-  if has("win32")
-    let Tlist_Ctags_Cmd = $VIM.'\ctags.exe'
-  endif
-  
+  " taglist.vim
   let Tlist_Sort_Type = "name"         " order by
   let Tlist_Use_Right_Window = 1       " split to the right side
-  let Tlist_Compart_Format = 1         " show small meny
-  let Tlist_Exist_OnlyWindow = 1       " if it's the last, kill it
+  let Tlist_Compact_Format = 1         " show small meny
+  let Tlist_Exit_OnlyWindow = 1        " if it's the last, kill it
   let Tlist_File_Fold_Auto_Close = 0   " do not close tags for others
   let Tlist_Enable_Fold_Column = 0     " do not show folding tree
   map <leader>t :Tlist<cr>
 
-  """"""""""""""""""""""""""""""
-  " => Others
-  """"""""""""""""""""""""""""""
   " a.vim          - alternate files fast (.c -> .h)
   " supertab.vim   - map <Tab> to SuperTab() function
   " lookupfile.vim - filename tags generated by find
   let g:LookupFile_TagExpr = '"./filenametags"'
   let g:LookupFile_DefaultCmd = ':LUBufs'
-  " calendar.vim   - folder to store diary
-  let g:calendar_diary = $vimdata.'/diary'
   " mru.vim        - file to save mru entries
   let MRU_File = $vimdata.'/_vim_mru_files'
   let MRU_Max_Entries = 20
@@ -482,28 +437,19 @@ map <leader>s? z=
   let FAV_File = $vimdata.'/_vim_fav_files'
   " yankring.vim   - map :YRShow
   map <leader>y :YRShow<cr>
+  let g:yankring_history_dir = expand('$vimdata')
   " doxygentoolkit.vim - map :Dox
   map <leader>d :Dox<cr>
-  " doxygen.vim    - load doxygen syntax for c/cpp/idl
-  "let load_doxygen_syntax = 1
-  " vcscommand.vim - svn executable path
-  "if has("win32")
-  "  let g:VCSCommandSVNExec = 'f:\bin\subversion\bin\svn.exe'
-  "endif
-  map <C-F11> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<cr>
-  map <C-F12> :%!astyle -t -b -S -w -M -p -U<cr>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Cope
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map <leader>n :cn<cr>
-map <leader>p :cp<cr>
-"map <leader>c :botright cw 10<cr>
-"map <c-u> <c-l><c-j>:q<cr>:botright cw 10<cr>
+  map <C-F11> :!ctags -R --c++-kinds=+p --fields=+iaS --extras=+q .<cr>
+  map <C-F12> :%!astyle -t -b -S -w -M -p -U<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map <leader>n :cn<cr>
+map <leader>p :cp<cr>
+
 " remove the windows ^M
 noremap <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
@@ -535,90 +481,6 @@ fu! SmartTOhtml()
   exe ":w!"
   exe ":bd"
 endf
-
-if has("win32")
-  " windows ddk, driver develop kit
-  set makeprg=for\ \%c\ in\ (\"pushd\ .\"\ \"setenv\ D:\\foo\\WINDDK\\2600\ chk\"\ \"popd\"\ \"build\ -cZ\"\ \"copy\ i386\\ds30xx.sys\ e:\\work\\X\\i386\")\ do\ call\ \%~c 
-endif
-
-"if filereadable($vimdata."/session.vim")
-"  au VimEnter * so $vimdata/session.vim
-"endif
-"au VimLeavePre * mks! $vimdata/session.vim
-
-fu! DoRunPyBuffer2()
-pclose! " force preview window closed
-setlocal ft=python
-
-" copy the buffer into a new window, then run that buffer through python
-sil %y a | below new | sil put a | sil %!python -
-" indicate the output window as the current previewwindow
-setlocal previewwindow ro nomodifiable nomodified
-
-" back into the original window
-winc p
-endfu
-
-command! RunPyBuffer call DoRunPyBuffer2()
-map <Leader>p :RunPyBuffer<CR>
-
-python << EOF
-
-import vim
-
-def SetBreakpoint():
-  import re
-
-  nLine = int(vim.eval('line(".")'))
-
-  strLine = vim.current.line
-  strWhite = re.search('^(\s*)', strLine).group(1)
-
-  vim.current.buffer.append(
-     "%(space)spdb.set_trace() %(mark)s Breakpoint %(mark)s" %
-     {'space':strWhite, 'mark': '#' * 30}, nLine - 1)
-
-  for strLine in vim.current.buffer:
-    if strLine == "import pdb":
-      break
-  else:
-    vim.current.buffer.append('import pdb', 0)
-    vim.command('normal j1')
-
-vim.command('map <f7> :py SetBreakpoint()<cr>')
-
-def RemoveBreakpoints():
-  import re
-
-  nCurrentLine = int(vim.eval('line(".")'))
-
-  nLines = []
-  nLine = 1
-  for strLine in vim.current.buffer:
-    if strLine == 'import pdb' or strLine.lstrip()[:15] == 'pdb.set_trace()':
-      nLines.append(nLine)
-    nLine += 1
-
-  nLines.reverse()
-
-  for nLine in nLines:
-    vim.command('normal %dG' % nLine)
-    vim.command('normal dd')
-    if nLine < nCurrentLine:
-      nCurrentLine -= 1
-
-  vim.command('normal %dG' % nCurrentLine)
-
-vim.command('map <s-f7> :py RemoveBreakpoints()<cr>')
-
-def RunDebugger():
-  vim.command('wall')
-  strFile = vim.eval("g:mainfile")
-  vim.command("!start python -m pdb %s" % strFile)
-
-vim.command('map <s-f12> :py RunDebugger()<cr>')
-
-EOF
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim: set et ft=vim tw=78 tags+=$VIMRUNTIME/doc/tags:
