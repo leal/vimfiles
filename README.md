@@ -1,5 +1,9 @@
 # vimrc
 
+## install ctags-win
+
+On Windows, please download [ctags-win](https://github.com/universal-ctags/ctags-win32/releases) and put it in your `$PATH` directory.
+
 ## install vim-plug
 
 [vim-plug](https://junegunn.github.io/vim-plug/) is a minimalist Vim plugin manager by Junegunn Choi. Download [plug.vim](https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim) and put it in the Vim "autoload" directory.
