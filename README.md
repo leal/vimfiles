@@ -1,5 +1,4 @@
-vimrc
-=====
+# vimrc
 
 ## install vim-plug
 
