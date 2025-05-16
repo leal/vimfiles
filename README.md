@@ -14,4 +14,10 @@ Download _vimrc and put it in `C:\Users\username\` on Windows or `~` in Linux.
 
 ## install plugs
 
-Run Vim and ex `:PlugInstall` to install all the plugs referred in _vimrc.
+Run Vim and ex `:PlugInstall` to install all the plugins referred in _vimrc.
+
+## credits
+
+- [vimtweak](https://github.com/mattn/vimtweak)
+- [vim-plug](https://junegunn.github.io/vim-plug/)
+- [ctags-win](https://github.com/universal-ctags/ctags-win32/releases)
