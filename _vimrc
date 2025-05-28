@@ -5,30 +5,9 @@
 " Derive:  Amix - http://www.amix.dk/vim/vimrc.html
 "          MetaCosm - http://vi-improved.org/vimrc.php
 "          Sidney - http://www.afn.org/~afn39695/sidney.htm
-" Section:
-" ------------------------------------------------------------------
-"   *> General
-"   *> Colors and fonts
-"   *> Visual cues
-"   *> Visual search
-"   *> Moving around and tabs
-"   *> Parenthesis/bracket expanding
-"   *> General abbrevs
-"   *> Editing mappings etc.
-"   *> Cmdline settings
-"   *> Buffer related
-"   *> Files and backups
-"   *> Text options
-"   *> Plugin settings
-"   *> Misc
-"
 " Usage:
-"   1. Create necessary folders and files.
-"      $vimdata  x:\vim\vimdata on windows, ~/.vimdata on linux
-"   2. Get your favorite scripts thru vim-plug
-"   3. Get necessary utilities, especially on windows, such as:
-"      wget  - http://users.ugent.be/~bpuype/wget/
-"      ctags - http://ctags.sf.net/
+"   1. Create ...\vimfiles\data on windows, ~/.vim/data on linux
+"   2. vim-plug rules, install utilities e.g. ctags on windows
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -38,7 +17,9 @@ set nocompatible        " use vim as vim, put at the very start
 map Q gq
 						" do not use Ex-mode, use Q for formatting
 set history=100         " lines of Ex commands, search history ...
-set browsedir=buffer    " use the directory of the related buffer
+if !has('nvim')
+  set browsedir=buffer  " use the directory of the related buffer
+endif
 set clipboard+=unnamed  " use register '*' for all y, d, c, p ops
 set isk+=$,%,#          " none of these should be word dividers
 set autoread            " auto read when a file is changed outside
@@ -49,13 +30,14 @@ set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
 if has("win32")         " platform dependent
   let $VIMRC    = $HOME.'/_vimrc'
   let $vimdata  = $HOME.'/vimfiles/data'
-  let plugged   = $HOME.'/vimfiles/plug'
+  let $plugged  = $HOME.'/vimfiles/plug'
   "set renderoptions=type:directx,renmode:5,taamode:1
 else
   let $VIMRC    = $HOME.'/.vimrc'
   let $vimdata  = $HOME.'/.vim/data'
-  let plugged   = $HOME.'/.vim/plug'
+  let $plugged  = $HOME.'/.vim/plug'
 endif
+set runtimepath+=$plugged
 
 filetype off
 
@@ -64,41 +46,58 @@ lan mes zh_CN.utf-8     " for encoding=utf-8
 
 set laststatus=2        " always show the status line
 
-silent! call plug#begin(plugged)
-Plug 'junegunn/vim-easy-align'
+let mapleader = ","     " set mapleader, then <leader> will be ,
+let g:mapleader = ","
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugins
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+silent! call plug#begin($plugged)
+Plug 'junegunn/vim-easy-align', { 'on': [] }
 Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'vim-scripts/a.vim'
-Plug 'vim-scripts/YankRing.vim'
-Plug 'yegappan/taglist'
-Plug 'ervandew/supertab'
+Plug 'vim-airline/vim-airline-themes', { 'on': [] }
+Plug 'vim-scripts/a.vim', { 'for': ['c', 'cpp', 'h'] }
+Plug 'vim-scripts/YankRing.vim', { 'on': [] }
+Plug 'yegappan/taglist', { 'on': ['Tlist'] }
+Plug 'ervandew/supertab',  { 'on': [] }
 Plug 'tomasr/molokai'
-Plug 'MarcWeber/vim-addon-mw-utils'
-Plug 'tomtom/tlib_vim'
-Plug 'kien/ctrlp.vim'
+Plug 'MarcWeber/vim-addon-mw-utils', { 'on': ['YRShow'] }
+Plug 'tomtom/tlib_vim', { 'on': [] }
+Plug 'kien/ctrlp.vim', { 'on': [] }
 call plug#end()
 
 filetype plugin on      " enable filetype plugin
 filetype indent on
+
+" if you don't need plugins with Vim
+let g:loaded_vimballPlugin   = 1
+let g:loaded_vimball         = 1
+let g:loaded_getscriptPlugin = 1
+let g:loaded_tarPlugin       = 1
+let g:loaded_zipPlugin       = 1
+let g:loaded_2html_plugin    = 1
+let g:loaded_gzip            = 1
 
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#buffer_nr_show = 1
+let g:airline#extensions#disable_rtp_load = 0
+let g:airline_extensions = ['tabline', 'keymap', 'quickfix', ]
 
 if g:airline_powerline_fonts
   if has("win32")
-    "try | set gfn=Source_Code_Pro_for_Powerline:h11:cANSI | catch | endtry
-    "try | set gfn=Sarasa_Term_SC:h11:cANSI:qDRAFT | catch | endtry
-    "try | set gfn=JetBrainsMono_NFM:h11:cANSI:qDRAFT | catch | endtry
-    "try | set gfw=Sarasa_Term_SC:h11:cGB2312 | catch | endtry
     try | set gfn=Maple_Mono_NF:h11:cANSI:qDRAFT | catch | endtry
     try | set gfw=Maple_Mono_NF_CN:h11:cGB2312 | catch | endtry
   else
     set gfn=Bitstream\ Vera\ Sans\ Mono\ 11
   endif
 else
+  fu! CurDir()
+    return tolower(substitute(getcwd(), '$HOME', "~/", "g"))
+  endf
+
   set statusline=\ %F%m%r%h\ %w\ %{&ff}\ \ now:\ %r%{CurDir()}%h\ \ \ pos:\ %l/%L:%c
   if has("win32")
     try | set gfn=Consolas:h12:cANSI | catch | endtry
@@ -107,26 +106,38 @@ else
   endif
 endif
 
+" taglist.vim
+let Tlist_Sort_Type = "name"         " order by
+let Tlist_Use_Right_Window = 1       " split to the right side
+let Tlist_Compact_Format = 1         " show small meny
+let Tlist_Exit_OnlyWindow = 1        " if it's the last, kill it
+let Tlist_File_Fold_Auto_Close = 0   " do not close tags for others
+let Tlist_Enable_Fold_Column = 0     " do not show folding tree
+map <leader>t :Tlist<cr>
+
+" yankring.vim   - map :YRShow
+map <leader>y :YRShow<cr>
+let g:yankring_history_dir = expand('$vimdata')
+
+map <C-F11> :!ctags -R --c++-kinds=+p --fields=+iaS --extras=+q .<cr>
+map <C-F12> :%!astyle -t -b -S -w -M -p -U<cr>
+
 if $TERM != "linux" && $TERM != "screen"
   set mouse=a           " except screen & SecureCRT's linux terminal
 endif
-
-let mapleader = ","     " set mapleader, then <leader> will be ,
-let g:mapleader = ","
                         " fast saving
 nmap <leader>w :w!<cr>
 nmap <leader>f :find<cr>
-
-                        " fast sourcing and editing of the .vimrc
-map <leader>s :source $VIMRC<cr>
+                        " fast editing of the .vimrc
 map <leader>e :e! $VIMRC<cr>
-"au! BufWritePost [\._]vimrc source $VIMRC
 
-set pastetoggle=<F3>    " when pasting something in, don't indent
+if !has('nvim')
+  set pastetoggle=<F3>  " when pasting something in, don't indent
+endif
 set path=.,/usr/include/*, " where gf, ^Wf, :find will search
 set tags=./tags,tags    " used by CTRL-] together with ctags
 set makeef=error.err    " the errorfile for :make and :grep
-set ffs=unix,dos,mac    " behaves good under both linux/windows
+set ffs=unix,dos,mac    " behaves good on both linux/windows
 nmap <leader>fd :se ff=dos<cr>
 nmap <leader>fu :se ff=unix<cr>
 
@@ -147,9 +158,9 @@ if has("gui_running")
     hi CursorColumn guibg=#333333
   endif
 else
-  colo desert
-  set background=light
+  set background=light  " before coloscheme
   set t_Co=256          " for vim-powerline or vim-airline
+  colo desert
 endif
 
 if v:version >= 700     " popmenu color setting
@@ -160,6 +171,9 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Visual cues
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if v:version >= 900     " popmenu color setting
+  set wildoptions=pum   " display the completion matches in popup munu
+endif
 set cursorline
 set scrolloff=7         " minimal screen lines above/below cursor
 set wildmenu            " :h and press <Tab> to see what happens
@@ -190,10 +204,10 @@ set completeopt=menu    " use popup menu to show possible completions
 set foldenable          " enable folding, I find it very useful
 set foldmethod=manual   " manual, marker, syntax, try set foldcolumn=2
 
-fu! CurDir()
-  let curdir = tolower(substitute(getcwd(), '$HOME', "~/", "g"))
-  return curdir
-endf
+if has("gui_running")
+  winpos 50 50          " GUI Vim window size and position
+  set lines=38 columns=150
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Visual search
@@ -214,8 +228,8 @@ fu! VisualSearch(direction) range
 endf
 
 " press * or # to search for the current selection (part of word)
-vnoremap <silent> * :call VisualSearch('f')<CR>
-vnoremap <silent> # :call VisualSearch('b')<CR>
+vnoremap <silent> * :call VisualSearch('f')<cr>
+vnoremap <silent> # :call VisualSearch('b')<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Moving around and tabs
@@ -277,13 +291,6 @@ inoremap $w ""<esc>:let leavechar='"'<cr>i
 imap <m-l> <esc>:exec "normal f" . leavechar<cr>a
 au BufNewFile,BufRead *.\(vim\)\@! inoremap " ""<esc>:let leavechar='"'<cr>i
 au BufNewFile,BufRead *.\(txt\)\@! inoremap ' ''<esc>:let leavechar="'"<cr>i
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => General abbrevs
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-iab xtime <c-r>=strftime("%Y-%m-%d %H:%M:%S")<cr>
-iab xdate <c-r>=strftime("%Y-%m-%d")<cr>
-iab xname Linxiao Li
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Editing mappings etc.
@@ -361,7 +368,11 @@ cno <Esc>f <S-Right>
 map <leader>q :e ~/buffer<cr>
 
 " restore cursor position in previous editing session, :h 'viminfo'
-set viminfo='10,\"100,:20,!,n~/.viminfo
+if has('nvim')
+  set viminfo='10,\"100,:20,!,n~/.viminfo
+else
+  set viminfo='10,\"100,:20,!,n~/_viminfo
+endif
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
 " buffer - reverse everything ... :)
@@ -414,37 +425,6 @@ au FileType html,python,vim,javascript setl shiftwidth=2
 au FileType html,python,vim,javascript setl tabstop=2
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Plugin settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-  " taglist.vim
-  let Tlist_Sort_Type = "name"         " order by
-  let Tlist_Use_Right_Window = 1       " split to the right side
-  let Tlist_Compact_Format = 1         " show small meny
-  let Tlist_Exit_OnlyWindow = 1        " if it's the last, kill it
-  let Tlist_File_Fold_Auto_Close = 0   " do not close tags for others
-  let Tlist_Enable_Fold_Column = 0     " do not show folding tree
-  map <leader>t :Tlist<cr>
-
-  " a.vim          - alternate files fast (.c -> .h)
-  " supertab.vim   - map <Tab> to SuperTab() function
-  " lookupfile.vim - filename tags generated by find
-  let g:LookupFile_TagExpr = '"./filenametags"'
-  let g:LookupFile_DefaultCmd = ':LUBufs'
-  " mru.vim        - file to save mru entries
-  let MRU_File = $vimdata.'/_vim_mru_files'
-  let MRU_Max_Entries = 20
-  " favmenu.vim    - file to save favorite items
-  let FAV_File = $vimdata.'/_vim_fav_files'
-  " yankring.vim   - map :YRShow
-  map <leader>y :YRShow<cr>
-  let g:yankring_history_dir = expand('$vimdata')
-  " doxygentoolkit.vim - map :Dox
-  map <leader>d :Dox<cr>
-
-  map <C-F11> :!ctags -R --c++-kinds=+p --fields=+iaS --extras=+q .<cr>
-  map <C-F12> :%!astyle -t -b -S -w -M -p -U<cr>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <leader>n :cn<cr>
@@ -464,23 +444,23 @@ fu! SuperRetab(width) range
   sil! exe a:firstline.','.a:lastline.'s/\v%(^ *)@<= {'. a:width .'}/\t/g'
 endf
 
-" inserts links & anchors on a TOhtml export.
-" Usage:
-"   *> Link
-"   => Anchor
-fu! SmartTOhtml()
-  let g:html_use_encoding = toupper(&fileencoding)
-  let g:html_use_css = 1
-  TOhtml
-  try
-    %s/&quot;\s\+\*&gt; \(.\+\)</" <a href="#\1" style="color: cyan">\1<\/a></g
-    %s/&quot;\(-\|\s\)\+\*&gt; \(.\+\)</" \&nbsp;\&nbsp; <a href="#\2" style="color: cyan;">\2<\/a></g
-    %s/&quot;\s\+=&gt; \(.\+\)</" <a name="\1" style="color: #fff">\1<\/a></g
-  catch
-  endtry
-  exe ":w!"
-  exe ":bd"
-endf
+" :call libcallnr("vimtweak64.dll", "EnableMaximize", 1)
+if has("win32") && has("gui_running")
+  fu! SetAlpha(alpha)
+    sil! exe ':call libcallnr("vimtweak64.dll", "SetAlpha", '. a:alpha .')'
+  endf
+  au VimEnter * call SetAlpha(234)
+endif
+
+augroup load_plug
+    au!
+    au InsertEnter * call plug#load('supertab') | au! load_plug
+    au InsertEnter * call plug#load('tlib_vim') | au! load_plug
+    au InsertEnter * call plug#load('ctrlp.vim') | au! load_plug
+    au InsertEnter * call plug#load('vim-easy-align') | au! load_plug
+    au InsertEnter * call plug#load('YankRing.vim') | au! load_plug
+    au InsertEnter * call plug#load('vim-airline-themes') | au! load_plug
+augroup end
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim: set et ft=vim tw=78 tags+=$VIMRUNTIME/doc/tags:
