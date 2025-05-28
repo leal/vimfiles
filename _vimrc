@@ -6,7 +6,7 @@
 "          MetaCosm - http://vi-improved.org/vimrc.php
 "          Sidney - http://www.afn.org/~afn39695/sidney.htm
 " Usage:
-"   1. Create ...\vimfiles\data on windows, ~/.vim/data on linux
+"   1. touch ...\vimfiles\data on windows, ~/.vim/data on linux
 "   2. vim-plug rules, install utilities e.g. ctags on windows
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -14,8 +14,6 @@
 " => General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set nocompatible        " use vim as vim, put at the very start
-map Q gq
-						" do not use Ex-mode, use Q for formatting
 set history=100         " lines of Ex commands, search history ...
 if !has('nvim')
   set browsedir=buffer  " use the directory of the related buffer
@@ -31,7 +29,6 @@ if has("win32")         " platform dependent
   let $VIMRC    = $HOME.'/_vimrc'
   let $vimdata  = $HOME.'/vimfiles/data'
   let $plugged  = $HOME.'/vimfiles/plug'
-  "set renderoptions=type:directx,renmode:5,taamode:1
 else
   let $VIMRC    = $HOME.'/.vimrc'
   let $vimdata  = $HOME.'/.vim/data'
@@ -45,6 +42,8 @@ set encoding=utf-8
 lan mes zh_CN.utf-8     " for encoding=utf-8
 
 set laststatus=2        " always show the status line
+set nowritebackup
+set noswapfile
 
 let mapleader = ","     " set mapleader, then <leader> will be ,
 let g:mapleader = ","
@@ -52,7 +51,16 @@ let g:mapleader = ","
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-silent! call plug#begin($plugged)
+" if you don't need plugins coming with Vim
+let g:loaded_vimballPlugin   = 1
+let g:loaded_vimball         = 1
+let g:loaded_getscriptPlugin = 1
+let g:loaded_tarPlugin       = 1
+let g:loaded_zipPlugin       = 1
+let g:loaded_2html_plugin    = 1
+let g:loaded_gzip            = 1
+
+sil! call plug#begin($plugged)
 Plug 'junegunn/vim-easy-align', { 'on': [] }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes', { 'on': [] }
@@ -68,15 +76,6 @@ call plug#end()
 
 filetype plugin on      " enable filetype plugin
 filetype indent on
-
-" if you don't need plugins with Vim
-let g:loaded_vimballPlugin   = 1
-let g:loaded_vimball         = 1
-let g:loaded_getscriptPlugin = 1
-let g:loaded_tarPlugin       = 1
-let g:loaded_zipPlugin       = 1
-let g:loaded_2html_plugin    = 1
-let g:loaded_gzip            = 1
 
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -119,9 +118,6 @@ map <leader>t :Tlist<cr>
 map <leader>y :YRShow<cr>
 let g:yankring_history_dir = expand('$vimdata')
 
-map <C-F11> :!ctags -R --c++-kinds=+p --fields=+iaS --extras=+q .<cr>
-map <C-F12> :%!astyle -t -b -S -w -M -p -U<cr>
-
 if $TERM != "linux" && $TERM != "screen"
   set mouse=a           " except screen & SecureCRT's linux terminal
 endif
@@ -142,7 +138,7 @@ nmap <leader>fd :se ff=dos<cr>
 nmap <leader>fu :se ff=unix<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Colors and fonts
+" => Visual cues
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 syntax enable           " enable syntax hl
 
@@ -153,10 +149,6 @@ if has("gui_running")
   let psc_style='cool'
   let g:molokai_original = 0
   colo molokai
-  if v:version >= 700 " highlight cursor line/column
-    hi CursorLine guibg=#333333 
-    hi CursorColumn guibg=#333333
-  endif
 else
   set background=light  " before coloscheme
   set t_Co=256          " for vim-powerline or vim-airline
@@ -168,18 +160,14 @@ if v:version >= 700     " popmenu color setting
   hi PmenuSel guibg=#555555 guifg=#ffffff
 endif
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Visual cues
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if v:version >= 900     " popmenu color setting
-  set wildoptions=pum   " display the completion matches in popup munu
+if v:version >= 900
+  set wildoptions=pum   " display the completion matches in popup menu
 endif
-set cursorline
+set completeopt=menu    " use popup menu to show possible completions
 set scrolloff=7         " minimal screen lines above/below cursor
 set wildmenu            " :h and press <Tab> to see what happens
 set wig=*.o,*.pyc       " type of file that will not in wildmenu
 set ruler               " show current position along the bottom
-set cmdheight=1         " use 1 screen lines for command-line
 set nolazyredraw        " redraw while executing macros (for qbuf)
 set hidden              " allow to change buffer without saving
 set backspace=2         " make backspace work normal
@@ -195,14 +183,10 @@ set hlsearch            " highlight all searched for phrases
 set incsearch           " highlight where the typed pattern matches
 map <silent> <leader><cr> :noh<cr>
                         " remove the highlight searched phrases
-set novisualbell        " no visual bell, no beeping
-set noerrorbells        " do not make noise
 set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$
                         " how :set list show
 set magic               " set magic on
-set completeopt=menu    " use popup menu to show possible completions
-set foldenable          " enable folding, I find it very useful
-set foldmethod=manual   " manual, marker, syntax, try set foldcolumn=2
+set cursorline
 
 if has("gui_running")
   winpos 50 50          " GUI Vim window size and position
@@ -215,13 +199,13 @@ endif
 " from an idea by Michael Naumann
 fu! VisualSearch(direction) range
   let l:saved_reg = @"
-  execute "normal! vgvy"
+  exe "normal! vgvy"
   let l:pattern = escape(@", '\\/.*$^~[]')
   let l:pattern = substitute(l:pattern, "\n$", "", "")
   if a:direction == 'b'
-    execute "normal ?" . l:pattern . "^M"
+    exe "normal ?" . l:pattern . "^M"
   else
-    execute "normal /" . l:pattern . "^M"
+    exe "normal /" . l:pattern . "^M"
   endif
   let @/ = l:pattern
   let @" = l:saved_reg
@@ -379,9 +363,9 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 map <F8> ggVGg?
 
 " don't close window, when deleting a buffer
-command! Bclose call <SID>BufcloseCloseIt()
+command! Bclose call <SID>BufCloseOnly()
 
-fu! <SID>BufcloseCloseIt()
+fu! <SID>BufCloseOnly()
   let l:currentBufNum = bufnr("%")
   let l:alternateBufNum = bufnr("#")
 
@@ -399,16 +383,8 @@ fu! <SID>BufcloseCloseIt()
 endf
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Files and backups
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set nobackup
-set nowritebackup
-set noswapfile
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Text options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set noexpandtab         " real tabs please!
 set tabstop=4           " tab spacing
 set softtabstop=4       " unify it
 set shiftwidth=4        " unify it
@@ -416,10 +392,9 @@ set smarttab            " use tabs at start of a line, spaces elsewhere
 set fo=tcrqnmM		      " see help formatoptions (complex)
 set linebreak           " wrap long lines at a character in 'breakat'
 set textwidth=500       " maximum width of text that is being inserted
-set ai                  " autoindent
-set si                  " smartindent
 set cindent             " do C-style indenting
-set wrap                " wrap lines
+set autoindent
+set smartindent
 
 au FileType html,python,vim,javascript setl shiftwidth=2
 au FileType html,python,vim,javascript setl tabstop=2
@@ -427,9 +402,6 @@ au FileType html,python,vim,javascript setl tabstop=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map <leader>n :cn<cr>
-map <leader>p :cp<cr>
-
 " remove the windows ^M
 noremap <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
