@@ -2,37 +2,32 @@
 "  \\|//  leal <linxiao.li AT gmail>
 "   o o   version 1.2505, since 1.0501
 "    U
-" Thanks: Amix - http://www.amix.dk/vim/vimrc.html
-"         MetaCosm - http://vi-improved.org/vimrc.php
-"         Sidney - http://www.afn.org/~afn39695/sidney.htm
-" Usage:  vim-plug rules, install utilities e.g. ctags on windows
+" Thanks: Amix - https://github.com/amix/vimrc, MetaCosm, Sydney
+" Usage:  vim-plug rules, install git, ctags first esp. on windows
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set nocompatible        " use vim as vim, put at the very start
-set history=100         " lines of Ex commands, search history ...
 if !has('nvim')
+  set nocompatible      " use vim as vim, put at the very start
   set browsedir=buffer  " use the directory of the related buffer
+  set pastetoggle=<F3>  " when pasting something in, don't indent
 endif
+set history=100         " lines of Ex commands, search history ...
 set clipboard+=unnamed  " use register '*' for all y, d, c, p ops
 set isk+=$,%,#          " none of these should be word dividers
 set autoread            " auto read when a file is changed outside
 set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
+set encoding=utf-8
+lan mes zh_CN.utf-8     " for encoding=utf-8
 
-if has("win32") | let prefix = '_' | else | let prefix = '.' | endif
+if has('win32') | let prefix = '_' | else | let prefix = '.' | endif
 let $VIMRC    = $HOME.'/'.prefix.'vimrc'
 let $vimdata  = $HOME.'/.vim/data'
 let $plugged  = $HOME.'/.vim/plug'
 set runtimepath+=$plugged
-
-filetype off
-
-set encoding=utf-8
-lan mes zh_CN.utf-8     " for encoding=utf-8
 
 set laststatus=2        " always show the status line
 set nowritebackup
@@ -41,7 +36,6 @@ set noswapfile
 let mapleader = ","     " set mapleader, then <leader> will be ,
 let g:mapleader = ","
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " if you don't need plugins coming with Vim
@@ -57,7 +51,7 @@ sil! call plug#begin($plugged)
 Plug 'junegunn/vim-easy-align', { 'on': [] }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes', { 'on': [] }
-Plug 'vim-scripts/a.vim', { 'for': ['c', 'cpp', 'h'] }
+Plug 'vim-scripts/a.vim', { 'on': [] }
 Plug 'vim-scripts/YankRing.vim', { 'on': [] }
 Plug 'yegappan/taglist', { 'on': ['Tlist'] }
 Plug 'ervandew/supertab',  { 'on': [] }
@@ -79,37 +73,26 @@ let g:airline#extensions#disable_rtp_load = 0
 let g:airline_extensions = ['tabline', 'keymap', 'quickfix', ]
 
 if g:airline_powerline_fonts
-  if has("win32")
+  if has('win32')
     set gfn=Maple_Mono_NF:h11:cANSI:qDRAFT
     set gfw=Maple_Mono_NF_CN:h11:cGB2312
-  else
-    set gfn=Bitstream\ Vera\ Sans\ Mono\ 11
   endif
 else
-  fu! CurDir()
-    return tolower(substitute(getcwd(), '$HOME', "~/", "g"))
-  endf
-
-  set statusline=\ %F%m%r%h\ %w\ %{&ff}\ \ now:\ %r%{CurDir()}%h\ \ \ pos:\ %l/%L:%c
-  if has("win32")
+  set statusline=\ %F%m%r%h\ %w\ %{&ff}\ \ now:\ %r%{getcwd()}%h\ \ \ pos:\ %l/%L:%c
+  if has('win32')
     set gfn=Consolas:h12:cANSI
-  else
-    set gfn=Bitstream\ Vera\ Sans\ Mono\ 11
   endif
 endif
 
-" taglist.vim
-let Tlist_Sort_Type = "name"         " order by
+let Tlist_Sort_Type = "name"         " taglist.vim, order by
 let Tlist_Use_Right_Window = 1       " split to the right side
 let Tlist_Compact_Format = 1         " show small meny
 let Tlist_Exit_OnlyWindow = 1        " if it's the last, kill it
-let Tlist_File_Fold_Auto_Close = 0   " do not close tags for others
 let Tlist_Enable_Fold_Column = 0     " do not show folding tree
 map <leader>t :Tlist<cr>
 
-" yankring.vim   - map :YRShow
-map <leader>y :YRShow<cr>
 let g:yankring_history_dir = expand('$vimdata')
+map <leader>y :YRShow<cr>
 
 if $TERM != "linux" && $TERM != "screen"
   set mouse=a           " except screen & SecureCRT's linux terminal
@@ -120,32 +103,29 @@ nmap <leader>f :find<cr>
                         " fast editing of the .vimrc
 map <leader>e :e! $VIMRC<cr>
 
-if !has('nvim')
-  set pastetoggle=<F3>  " when pasting something in, don't indent
-endif
 set path=.,/usr/include/*, " where gf, ^Wf, :find will search
 set tags=./tags,tags    " used by CTRL-] together with ctags
 set makeef=error.err    " the errorfile for :make and :grep
-set ffs=unix,dos,mac    " behaves good on both linux/windows
+set ffs=unix,dos,mac    " behaves good on both linux and windows
 nmap <leader>fd :se ff=dos<cr>
 nmap <leader>fu :se ff=unix<cr>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Visual cues
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 syntax enable           " enable syntax hl
 
-if has("gui_running")
-  set guioptions-=r
-  set guioptions-=L
-  set guioptions-=T
-  let psc_style='cool'
-  let g:molokai_original = 0
+if has('gui_running')
+  set guioptions-=r | set guioptions-=L | set guioptions-=T
+  winpos 50 50 | set lines=38 columns=150
   colo molokai
 else
   set background=light  " before coloscheme
-  set t_Co=256          " for vim-powerline or vim-airline
+  set t_Co=256          " for vim-airline
   colo desert
+
+  set termguicolors     " might no need on Linux or Mac OS
+  highlight Normal guibg=NONE ctermbg=NONE
+  highlight NonText guibg=NONE ctermbg=NONE
 endif
 
 if v:version >= 700     " popmenu color setting
@@ -154,20 +134,19 @@ if v:version >= 700     " popmenu color setting
 endif
 
 if v:version >= 900
-  set wildoptions=pum   " display the completion matches in popup menu
+  set wildoptions=pum   " possible completions in popup menu
 endif
-set completeopt=menu    " use popup menu to show possible completions
+set completeopt=menu    " possible ins completions in popup menu
 set scrolloff=7         " minimal screen lines above/below cursor
 set wildmenu            " :h and press <Tab> to see what happens
 set wig=*.o,*.pyc       " type of file that will not in wildmenu
 set ruler               " show current position along the bottom
-set nolazyredraw        " redraw while executing macros (for qbuf)
 set hidden              " allow to change buffer without saving
 set backspace=2         " make backspace work normal
 set whichwrap+=<,>,h,l  " allow backspace and cursor keys to wrap
 set shortmess=atI       " shorten to avoid 'press a key' prompt
 set report=0            " tell us when anything is changed via :...
-set fillchars=vert:\ ,stl:\ ,stlnc:\ 
+set fillchars=vert:\ ,stl:\ ,stlnc:\
                         " make splitters between windows be blank
 set showmatch           " show matching paren when a bracket inserted
 set matchtime=2         " how many tenths of a second to blink
@@ -181,13 +160,7 @@ set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$
 set magic               " set magic on
 set cursorline
 
-if has("gui_running")
-  winpos 50 50          " GUI Vim window size and position
-  set lines=38 columns=150
-endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Visual search
+" => Moving around and tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " from an idea by Michael Naumann
 fu! VisualSearch(direction) range
@@ -208,9 +181,6 @@ endf
 vnoremap <silent> * :call VisualSearch('f')<cr>
 vnoremap <silent> # :call VisualSearch('b')<cr>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Moving around and tabs
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " map space to / and c-space to ?
 map <space> /
 map <C-space> ?
@@ -221,8 +191,7 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" actually, the tab does not switch buffers, but my arrows
-" bclose function can be found in "Buffer related" section
+" actually, the tab does not switch buffers, but this works
 map <leader>bd :Bclose<cr>
 map <down> <esc>:Tlist<cr>
 " use the arrows to do something useful
@@ -231,12 +200,12 @@ map <left> :bp<cr>
 
 " tab configuration
 map <leader>tn :tabnew %<cr>
-map <leader>te :tabedit 
+map <leader>te :tabedit
 map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove 
+map <leader>tm :tabmove
 try
   set switchbuf=usetab
-  if has("gui_running") | set stal=1 | else | set stal=2 | endif
+  if has('gui_running') | set stal=1 | else | set stal=2 | endif
 catch
 endtry
 
@@ -249,27 +218,6 @@ imap <D-0> <esc>0i
 " switch to current dir
 map <leader>c :cd %:p:h<cr>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Parenthesis/bracket expanding
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-vnoremap $1 <esc>`>a)<esc>`<i(<esc>
-vnoremap $2 <esc>`>a]<esc>`<i[<esc>
-vnoremap $3 <esc>`>a}<esc>`<i{<esc>
-vnoremap $q <esc>`>a'<esc>`<i'<esc>
-vnoremap $w <esc>`>a"<esc>`<i"<esc>
-
-" map auto complete of (, [, {, ', "
-inoremap $1 ()<esc>:let leavechar=")"<cr>i
-inoremap $2 []<esc>:let leavechar="]"<cr>i
-inoremap $3 {}<esc>:let leavechar="}"<cr>i
-inoremap $4 {<esc>o}<esc>:let leavechar="}"<cr>O
-inoremap $q ''<esc>:let leavechar="'"<cr>i
-inoremap $w ""<esc>:let leavechar='"'<cr>i
-imap <m-l> <esc>:exec "normal f" . leavechar<cr>a
-au BufNewFile,BufRead *.\(vim\)\@! inoremap " ""<esc>:let leavechar='"'<cr>i
-au BufNewFile,BufRead *.\(txt\)\@! inoremap ' ''<esc>:let leavechar="'"<cr>i
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Editing mappings etc.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " remap Vim 0
@@ -289,23 +237,22 @@ fu! DeleteTrailingWS()
 endf
 au BufWrite *.py :call DeleteTrailingWS()
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Cmdline settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 fu! DeleteTillSlash()
   let g:cmd = getcmdline()
-  if has("unix")
+  if has('unix')
     let g:cmd_edited = substitute(g:cmd, "\\(.*\[/\]\\).*", "\\1", "")
   else
     let g:cmd_edited = substitute(g:cmd, "\\(.*\[\\\\]\\).*", "\\1", "")
   endif
   if g:cmd == g:cmd_edited
-    if has("unix")
+    if has('unix')
       let g:cmd_edited = substitute(g:cmd, "\\(.*\[/\]\\).*/", "\\1", "")
     else
       let g:cmd_edited = substitute(g:cmd, "\\(.*\[\\\\\]\\).*\[\\\\\]", "\\1", "")
     endif
-  endif   
+  endif
   return g:cmd_edited
 endf
 
@@ -336,14 +283,8 @@ cno <C-B> <Left>
 cno <Esc>b <S-Left>
 cno <Esc>f <S-Right>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Buffer related
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" fast open a buffer by search for a name
-"map <c-q> :sb 
-" open a dummy buffer for paste
-map <leader>q :e ~/buffer<cr>
-
 " restore cursor position in previous editing session, :h 'viminfo'
 set viminfo='10,\"100,:20,!
 if has('nvim') | set viminfo+=n~/.viminfo | else | set viminfo+=n~/.viminfo- | endif
@@ -373,7 +314,6 @@ fu! <SID>BufCloseOnly()
   endif
 endf
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Text options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set tabstop=4           " tab spacing
@@ -390,7 +330,6 @@ set smartindent
 au FileType html,python,vim,javascript setl shiftwidth=2
 au FileType html,python,vim,javascript setl tabstop=2
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " remove the windows ^M
@@ -408,7 +347,7 @@ fu! SuperRetab(width) range
 endf
 
 " :call libcallnr("vimtweak64.dll", "EnableMaximize", 1)
-if has("win32") && has("gui_running")
+if has('win32') && has('gui_running')
   fu! SetAlpha(alpha)
     sil! exe ':call libcallnr("vimtweak64.dll", "SetAlpha", '. a:alpha .')'
   endf
@@ -417,19 +356,9 @@ endif
 
 augroup lazy_load
   au!
-  au InsertEnter * call plug#load('supertab')
-  au InsertEnter * call plug#load('tlib_vim')
-  au InsertEnter * call plug#load('ctrlp.vim')
-  au InsertEnter * call plug#load('vim-easy-align')
-  au InsertEnter * call plug#load('YankRing.vim')
-  au InsertEnter * call plug#load('vim-airline-themes') | au! lazy_load
+  au InsertEnter * call plug#load('vim-easy-align', 'vim-airline-themes', 'YankRing.vim')
+  au InsertEnter * call plug#load('supertab', 'tlib_vim', 'ctrlp.vim', 'a.vim') | au! lazy_load
 augroup end
-
-if !has("gui_running")
-  set termguicolors
-  highlight Normal guibg=NONE ctermbg=NONE
-  highlight NonText guibg=NONE ctermbg=NONE
-endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim: set et ft=vim tw=78 tags+=$VIMRUNTIME/doc/tags:
