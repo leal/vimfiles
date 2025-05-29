@@ -1,13 +1,11 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"   \\|//  leal <linxiao.li AT gmail>
-"    o o   version 1.2505, since 1.0501
-"     U    
-" Derive:  Amix - http://www.amix.dk/vim/vimrc.html
-"          MetaCosm - http://vi-improved.org/vimrc.php
-"          Sidney - http://www.afn.org/~afn39695/sidney.htm
-" Usage:
-"   1. touch ...\vimfiles\data on windows, ~/.vim/data on linux
-"   2. vim-plug rules, install utilities e.g. ctags on windows
+"  \\|//  leal <linxiao.li AT gmail>
+"   o o   version 1.2505, since 1.0501
+"    U
+" Thanks: Amix - http://www.amix.dk/vim/vimrc.html
+"         MetaCosm - http://vi-improved.org/vimrc.php
+"         Sidney - http://www.afn.org/~afn39695/sidney.htm
+" Usage:  vim-plug rules, install utilities e.g. ctags on windows
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -25,15 +23,10 @@ set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
 
-if has("win32")         " platform dependent
-  let $VIMRC    = $HOME.'/_vimrc'
-  let $vimdata  = $HOME.'/vimfiles/data'
-  let $plugged  = $HOME.'/vimfiles/plug'
-else
-  let $VIMRC    = $HOME.'/.vimrc'
-  let $vimdata  = $HOME.'/.vim/data'
-  let $plugged  = $HOME.'/.vim/plug'
-endif
+if has("win32") | let prefix = '_' | else | let prefix = '.' | endif
+let $VIMRC    = $HOME.'/'.prefix.'vimrc'
+let $vimdata  = $HOME.'/.vim/data'
+let $plugged  = $HOME.'/.vim/plug'
 set runtimepath+=$plugged
 
 filetype off
@@ -87,8 +80,8 @@ let g:airline_extensions = ['tabline', 'keymap', 'quickfix', ]
 
 if g:airline_powerline_fonts
   if has("win32")
-    try | set gfn=Maple_Mono_NF:h11:cANSI:qDRAFT | catch | endtry
-    try | set gfw=Maple_Mono_NF_CN:h11:cGB2312 | catch | endtry
+    set gfn=Maple_Mono_NF:h11:cANSI:qDRAFT
+    set gfw=Maple_Mono_NF_CN:h11:cGB2312
   else
     set gfn=Bitstream\ Vera\ Sans\ Mono\ 11
   endif
@@ -99,7 +92,7 @@ else
 
   set statusline=\ %F%m%r%h\ %w\ %{&ff}\ \ now:\ %r%{CurDir()}%h\ \ \ pos:\ %l/%L:%c
   if has("win32")
-    try | set gfn=Consolas:h12:cANSI | catch | endtry
+    set gfn=Consolas:h12:cANSI
   else
     set gfn=Bitstream\ Vera\ Sans\ Mono\ 11
   endif
@@ -352,11 +345,9 @@ cno <Esc>f <S-Right>
 map <leader>q :e ~/buffer<cr>
 
 " restore cursor position in previous editing session, :h 'viminfo'
-if has('nvim')
-  set viminfo='10,\"100,:20,!,n~/.viminfo
-else
-  set viminfo='10,\"100,:20,!,n~/_viminfo
-endif
+set viminfo='10,\"100,:20,!
+if has('nvim') | set viminfo+=n~/.viminfo | else | set viminfo+=n~/.viminfo- | endif
+
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
 " buffer - reverse everything ... :)
@@ -421,18 +412,24 @@ if has("win32") && has("gui_running")
   fu! SetAlpha(alpha)
     sil! exe ':call libcallnr("vimtweak64.dll", "SetAlpha", '. a:alpha .')'
   endf
-  au VimEnter * call SetAlpha(234)
+  au VimEnter * call SetAlpha(210)
 endif
 
-augroup load_plug
-    au!
-    au InsertEnter * call plug#load('supertab') | au! load_plug
-    au InsertEnter * call plug#load('tlib_vim') | au! load_plug
-    au InsertEnter * call plug#load('ctrlp.vim') | au! load_plug
-    au InsertEnter * call plug#load('vim-easy-align') | au! load_plug
-    au InsertEnter * call plug#load('YankRing.vim') | au! load_plug
-    au InsertEnter * call plug#load('vim-airline-themes') | au! load_plug
+augroup lazy_load
+  au!
+  au InsertEnter * call plug#load('supertab')
+  au InsertEnter * call plug#load('tlib_vim')
+  au InsertEnter * call plug#load('ctrlp.vim')
+  au InsertEnter * call plug#load('vim-easy-align')
+  au InsertEnter * call plug#load('YankRing.vim')
+  au InsertEnter * call plug#load('vim-airline-themes') | au! lazy_load
 augroup end
+
+if !has("gui_running")
+  set termguicolors
+  highlight Normal guibg=NONE ctermbg=NONE
+  highlight NonText guibg=NONE ctermbg=NONE
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim: set et ft=vim tw=78 tags+=$VIMRUNTIME/doc/tags:
