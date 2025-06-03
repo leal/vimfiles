@@ -145,7 +145,7 @@ set backspace=2         " make backspace work normal
 set whichwrap+=<,>,h,l  " allow backspace and cursor keys to wrap
 set shortmess=atI       " shorten to avoid 'press a key' prompt
 set report=0            " tell us when anything is changed via :...
-set fillchars=vert:\ ,stl:\ ,stlnc:\
+set fillchars=vert:\ ,stl:\ ,stlnc:\ 
                         " make splitters between windows be blank
 set showmatch           " show matching paren when a bracket inserted
 set matchtime=2         " how many tenths of a second to blink
