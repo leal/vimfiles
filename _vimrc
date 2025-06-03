@@ -48,17 +48,16 @@ let g:loaded_2html_plugin    = 1
 let g:loaded_gzip            = 1
 
 sil! call plug#begin($plugged)
-Plug 'junegunn/vim-easy-align', { 'on': [] }
+Plug 'tomasr/molokai'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes', { 'on': [] }
 Plug 'vim-scripts/a.vim', { 'on': [] }
 Plug 'vim-scripts/YankRing.vim', { 'on': [] }
 Plug 'yegappan/taglist', { 'on': ['Tlist'] }
-Plug 'ervandew/supertab',  { 'on': [] }
-Plug 'tomasr/molokai'
-Plug 'MarcWeber/vim-addon-mw-utils', { 'on': ['YRShow'] }
-Plug 'tomtom/tlib_vim', { 'on': [] }
-Plug 'kien/ctrlp.vim', { 'on': [] }
+Plug 'ervandew/supertab', { 'on': [] }
+Plug 'junegunn/vim-easy-align', { 'on': [] }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim', { 'on': [] }
 call plug#end()
 
 filetype plugin on      " enable filetype plugin
@@ -295,9 +294,9 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 map <F8> ggVGg?
 
 " don't close window, when deleting a buffer
-command! Bclose call <SID>BufCloseOnly()
+command! Bclose call <SID>BufCloseIt()
 
-fu! <SID>BufCloseOnly()
+fu! <SID>BufCloseIt()
   let l:currentBufNum = bufnr("%")
   let l:alternateBufNum = bufnr("#")
 
@@ -356,8 +355,8 @@ endif
 
 augroup lazy_load
   au!
-  au InsertEnter * call plug#load('vim-easy-align', 'vim-airline-themes', 'YankRing.vim')
-  au InsertEnter * call plug#load('supertab', 'tlib_vim', 'ctrlp.vim', 'a.vim') | au! lazy_load
+  au InsertEnter * call plug#load('vim-easy-align', 'vim-airline-themes', 'fzf.vim')
+  au InsertEnter * call plug#load('supertab', 'YankRing.vim', 'a.vim') | au! lazy_load
 augroup end
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
