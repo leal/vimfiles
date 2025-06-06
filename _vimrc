@@ -1,9 +1,7 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"  \\|//  leal <linxiao.li AT gmail>
-"   o o   version 1.2505, since 1.0501
-"    U
-" Thanks: Amix - https://github.com/amix/vimrc, MetaCosm, Sydney
-" Usage:  vim-plug rules, install git, ctags first esp. on windows
+"  \\|//  leal @github  version 1.2506, since 1.0501
+"   o o   Thanks: Amix @github, MetaCosm, Sydney
+"    U    vim-plug rules, install git, fzf, ctags, ripgrep
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " => General
@@ -12,24 +10,23 @@ if !has('nvim')
   set nocompatible      " use vim as vim, put at the very start
   set browsedir=buffer  " use the directory of the related buffer
   set pastetoggle=<F3>  " when pasting something in, don't indent
+  set history=100       " lines of Ex commands, search history ...
+  set autoread          " auto read when a file is changed outside
+  set laststatus=2      " always show the status line
 endif
-set history=100         " lines of Ex commands, search history ...
 set clipboard+=unnamed  " use register '*' for all y, d, c, p ops
 set isk+=$,%,#          " none of these should be word dividers
-set autoread            " auto read when a file is changed outside
 set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
-set encoding=utf-8
 lan mes zh_CN.utf-8     " for encoding=utf-8
 
-if has('win32') | let prefix = '_' | else | let prefix = '.' | endif
-let $VIMRC    = $HOME.'/'.prefix.'vimrc'
-let $vimdata  = $HOME.'/.vim/data'
-let $plugged  = $HOME.'/.vim/plug'
+let dotor_ = has('win32') ? '_' : '.'
+let $VIMRC   = $HOME ..'/'.. dotor_ ..'vimrc'
+let $vimdata = $HOME ..'/.vim/data'
+let $plugged = $HOME ..'/.vim/plug'
 set runtimepath+=$plugged
 
-set laststatus=2        " always show the status line
 set nowritebackup
 set noswapfile
 
@@ -38,7 +35,7 @@ let g:mapleader = ","
 
 " => Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if you don't need plugins coming with Vim
+" disable some Vim built-in rtp plugins
 let g:loaded_vimballPlugin   = 1
 let g:loaded_vimball         = 1
 let g:loaded_getscriptPlugin = 1
@@ -58,12 +55,14 @@ Plug 'ervandew/supertab', { 'on': [] }
 Plug 'junegunn/vim-easy-align', { 'on': [] }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim', { 'on': [] }
+Plug 'easymotion/vim-easymotion', { 'on': [] }
 call plug#end()
 
 filetype plugin on      " enable filetype plugin
 filetype indent on
 
 let g:airline_powerline_fonts = 1
+let g:airline_highlighting_cache = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
@@ -98,14 +97,12 @@ if $TERM != "linux" && $TERM != "screen"
 endif
                         " fast saving
 nmap <leader>w :w!<cr>
-nmap <leader>f :find<cr>
                         " fast editing of the .vimrc
 map <leader>e :e! $VIMRC<cr>
 
-set path=.,/usr/include/*, " where gf, ^Wf, :find will search
 set tags=./tags,tags    " used by CTRL-] together with ctags
 set makeef=error.err    " the errorfile for :make and :grep
-set ffs=unix,dos,mac    " behaves good on both linux and windows
+set ffs=unix,dos        " behaves good on both linux and windows
 nmap <leader>fd :se ff=dos<cr>
 nmap <leader>fu :se ff=unix<cr>
 
@@ -119,10 +116,10 @@ if has('gui_running')
   colo molokai
 else
   set background=light  " before coloscheme
-  set t_Co=256          " for vim-airline
+  "set t_Co=256          " for vim-airline
+  set termguicolors     " might no need on Linux or Mac OS
   colo desert
 
-  set termguicolors     " might no need on Linux or Mac OS
   highlight Normal guibg=NONE ctermbg=NONE
   highlight NonText guibg=NONE ctermbg=NONE
 endif
@@ -148,7 +145,6 @@ set report=0            " tell us when anything is changed via :...
 set fillchars=vert:\ ,stl:\ ,stlnc:\ 
                         " make splitters between windows be blank
 set showmatch           " show matching paren when a bracket inserted
-set matchtime=2         " how many tenths of a second to blink
 set ignorecase          " the case of normal letters is ignored
 set hlsearch            " highlight all searched for phrases
 set incsearch           " highlight where the typed pattern matches
@@ -168,9 +164,9 @@ fu! VisualSearch(direction) range
   let l:pattern = escape(@", '\\/.*$^~[]')
   let l:pattern = substitute(l:pattern, "\n$", "", "")
   if a:direction == 'b'
-    exe "normal ?" . l:pattern . "^M"
+    exe "normal ?".. l:pattern .."^M"
   else
-    exe "normal /" . l:pattern . "^M"
+    exe "normal /".. l:pattern .."^M"
   endif
   let @/ = l:pattern
   let @" = l:saved_reg
@@ -204,7 +200,7 @@ map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
 try
   set switchbuf=usetab
-  if has('gui_running') | set stal=1 | else | set stal=2 | endif
+  if !has('gui_running') | set stal=2 | endif
 catch
 endtry
 
@@ -255,22 +251,18 @@ fu! DeleteTillSlash()
   return g:cmd_edited
 endf
 
+cno $q <C-\>eDeleteTillSlash()<cr>
+
 fu! CurrentFileDir(cmd)
-  return a:cmd . " " . expand("%:p:h") . "/"
+  return a:cmd .." ".. expand("%:p:h") .."/"
 endf
 
-" smart mappings on the cmdline
-cno $h e ~/
-cno $j e ./
-
-cno $q <C-\>eDeleteTillSlash()<cr>
 cno $c e <C-\>eCurrentFileDir("e")<cr>
-
 cno $tc <C-\>eCurrentFileDir("tabnew")<cr>
 cno $th tabnew ~/
 
 fu! CurrentWord(cmd)
-  return a:cmd . " /" . expand("<cword>") . "/ " . "*.h *.c"
+  return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
 endf
 cno $v <C-\>eCurrentWord("vimgrep")<cr><Home><S-Right><Right><Right>
 map <c-q> :$v
@@ -284,9 +276,7 @@ cno <Esc>f <S-Right>
 
 " => Buffer related
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" restore cursor position in previous editing session, :h 'viminfo'
-set viminfo='10,\"100,:20,!
-if has('nvim') | set viminfo+=n~/.viminfo | else | set viminfo+=n~/.viminfo- | endif
+if has('nvim') | set viminfo+=n~/.shada | else | set viminfo+=!,n~/.viminfo | endif
 
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
@@ -342,22 +332,21 @@ inoremap <C-V> <esc>:set paste<cr>mui<C-R>+<esc>mv'uV'v=:set nopaste<cr>
 
 " select range, hit :call SuperRetab($width) - by p0g and FallingCow
 fu! SuperRetab(width) range
-  sil! exe a:firstline.','.a:lastline.'s/\v%(^ *)@<= {'. a:width .'}/\t/g'
+  sil! exe a:firstline ..','.. a:lastline ..'s/\v%(^ *)@<= {'.. a:width ..'}/\t/g'
 endf
 
 " :call libcallnr("vimtweak64.dll", "EnableMaximize", 1)
 if has('win32') && has('gui_running')
   fu! SetAlpha(alpha)
-    sil! exe ':call libcallnr("vimtweak64.dll", "SetAlpha", '. a:alpha .')'
+    sil! exe ':call libcallnr("vimtweak64.dll", "SetAlpha", '.. a:alpha ..')'
   endf
   au VimEnter * call SetAlpha(210)
 endif
 
 augroup lazy_load
   au!
-  au InsertEnter * call plug#load('vim-easy-align', 'vim-airline-themes', 'fzf.vim')
-  au InsertEnter * call plug#load('supertab', 'YankRing.vim', 'a.vim') | au! lazy_load
+  au InsertEnter * call plug#load('vim-easy-align', 'vim-airline-themes', 'vim-easymotion')
+  au InsertEnter * call plug#load('supertab', 'YankRing.vim', 'a.vim', 'fzf.vim') | au! lazy_load
 augroup end
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim: set et ft=vim tw=78 tags+=$VIMRUNTIME/doc/tags:
