@@ -30,7 +30,7 @@ set runtimepath+=$plugged
 set nowritebackup
 set noswapfile
 
-let mapleader = ","     " set mapleader, then <leader> will be ,
+let mapleader = ","     " map <leader> will be ,
 let g:mapleader = ","
 
 " => Plugins
@@ -48,26 +48,23 @@ sil! call plug#begin($plugged)
 Plug 'tomasr/molokai'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes', { 'on': [] }
-Plug 'vim-scripts/a.vim', { 'on': [] }
+Plug 'vim-scripts/a.vim', { 'for': ['c', 'cpp'] }
 Plug 'vim-scripts/YankRing.vim', { 'on': [] }
 Plug 'yegappan/taglist', { 'on': ['Tlist'] }
 Plug 'ervandew/supertab', { 'on': [] }
 Plug 'junegunn/vim-easy-align', { 'on': [] }
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf', { 'on': ['FZF'], 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim', { 'on': [] }
 Plug 'easymotion/vim-easymotion', { 'on': [] }
 call plug#end()
-
-filetype plugin on      " enable filetype plugin
-filetype indent on
+" automatically executes filetype plugin indent on and syntax enable
 
 let g:airline_powerline_fonts = 1
-let g:airline_highlighting_cache = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#buffer_nr_show = 1
-let g:airline#extensions#disable_rtp_load = 0
+let g:airline#extensions#disable_rtp_load = 1
 let g:airline_extensions = ['tabline', 'keymap', 'quickfix', ]
 
 if g:airline_powerline_fonts
@@ -100,24 +97,19 @@ nmap <leader>w :w!<cr>
                         " fast editing of the .vimrc
 map <leader>e :e! $VIMRC<cr>
 
-set tags=./tags,tags    " used by CTRL-] together with ctags
-set makeef=error.err    " the errorfile for :make and :grep
 set ffs=unix,dos        " behaves good on both linux and windows
 nmap <leader>fd :se ff=dos<cr>
 nmap <leader>fu :se ff=unix<cr>
 
 " => Visual cues
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-syntax enable           " enable syntax hl
-
 if has('gui_running')
   set guioptions-=r | set guioptions-=L | set guioptions-=T
   winpos 50 50 | set lines=38 columns=150
   colo molokai
 else
   set background=light  " before coloscheme
-  "set t_Co=256          " for vim-airline
-  set termguicolors     " might no need on Linux or Mac OS
+  set termguicolors     " might need only on Windows, set t_Co=256?
   colo desert
 
   highlight Normal guibg=NONE ctermbg=NONE
@@ -186,9 +178,9 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" actually, the tab does not switch buffers, but this works
 map <leader>bd :Bclose<cr>
 map <down> <esc>:Tlist<cr>
+
 " use the arrows to do something useful
 map <right> :bn<cr>
 map <left> :bp<cr>
@@ -259,7 +251,6 @@ endf
 
 cno $c e <C-\>eCurrentFileDir("e")<cr>
 cno $tc <C-\>eCurrentFileDir("tabnew")<cr>
-cno $th tabnew ~/
 
 fu! CurrentWord(cmd)
   return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
@@ -283,23 +274,22 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 " buffer - reverse everything ... :)
 map <F8> ggVGg?
 
-" don't close window, when deleting a buffer
+" don't close window when deleting a buffer
 command! Bclose call <SID>BufCloseIt()
 
 fu! <SID>BufCloseIt()
-  let l:currentBufNum = bufnr("%")
-  let l:alternateBufNum = bufnr("#")
+  let l:curr_bufnr = bufnr("%")
 
-  if buflisted(l:alternateBufNum)
+  if buflisted(bufnr("#"))
     buffer #
   else
     bnext
   endif
-  if bufnr("%") == l:currentBufNum
+  if bufnr("%") == l:curr_bufnr
     new
   endif
-  if buflisted(l:currentBufNum)
-    execute("bdelete! ".l:currentBufNum)
+  if buflisted(l:curr_bufnr)
+    execute("bdelete! ".. l:curr_bufnr)
   endif
 endf
 
@@ -316,8 +306,7 @@ set cindent             " do C-style indenting
 set autoindent
 set smartindent
 
-au FileType html,python,vim,javascript setl shiftwidth=2
-au FileType html,python,vim,javascript setl tabstop=2
+au FileType html,python,vim,javascript setl shiftwidth=2 tabstop=2
 
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -346,7 +335,7 @@ endif
 augroup lazy_load
   au!
   au InsertEnter * call plug#load('vim-easy-align', 'vim-airline-themes', 'vim-easymotion')
-  au InsertEnter * call plug#load('supertab', 'YankRing.vim', 'a.vim', 'fzf.vim') | au! lazy_load
+  au InsertEnter * call plug#load('supertab', 'YankRing.vim', 'fzf', 'fzf.vim') | au! lazy_load
 augroup end
 
 " vim: set et ft=vim tw=78 tags+=$VIMRUNTIME/doc/tags:
