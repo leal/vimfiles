@@ -149,16 +149,12 @@ set cursorline
 " => Moving around and tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " from an idea by Michael Naumann
-fu! VisualSearch(direction) range
+fu! VisualSearch(dir) range
   let l:saved_reg = @"
   exe "normal! vgvy"
   let l:pattern = escape(@", '\\/.*$^~[]')
   let l:pattern = substitute(l:pattern, "\n$", "", "")
-  if a:direction == 'b'
-    exe "normal ?".. l:pattern .."^M"
-  else
-    exe "normal /".. l:pattern .."^M"
-  endif
+  exe "normal ".. (a:dir == 'b' ? "?" : "/") .. l:pattern .."^M"
   let @/ = l:pattern
   let @" = l:saved_reg
 endf
