@@ -109,7 +109,7 @@ if has('gui_running')
   colo molokai
 else
   set background=light  " before coloscheme
-  set termguicolors     " might need only on Windows, set t_Co=256?
+  set termguicolors     " might need only on windows, set t_Co=256?
   colo desert
 
   highlight Normal guibg=NONE ctermbg=NONE
@@ -144,7 +144,6 @@ map <silent> <leader><cr> :noh<cr>
                         " remove the highlight searched phrases
 set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$
                         " how :set list show
-set magic               " set magic on
 set cursorline
 
 " => Moving around and tabs
@@ -168,9 +167,7 @@ endf
 vnoremap <silent> * :call VisualSearch('f')<cr>
 vnoremap <silent> # :call VisualSearch('b')<cr>
 
-" map space to / and c-space to ?
-map <space> /
-map <C-space> ?
+map <space> ?
 
 " smart way to switch between windows
 map <C-j> <C-W>j
@@ -190,17 +187,9 @@ map <leader>tn :tabnew %<cr>
 map <leader>te :tabedit
 map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
-try
-  set switchbuf=usetab
-  if !has('gui_running') | set stal=2 | endif
-catch
-endtry
 
-" moving fast to front, back and 2 sides ;)
-imap <m-$> <esc>$a
-imap <m-0> <esc>0i
-imap <D-$> <esc>$a
-imap <D-0> <esc>0i
+set switchbuf=usetab
+if !has('gui_running') | set stal=2 | endif
 
 " switch to current dir
 map <leader>c :cd %:p:h<cr>
@@ -229,15 +218,15 @@ au BufWrite *.py :call DeleteTrailingWS()
 fu! DeleteTillSlash()
   let g:cmd = getcmdline()
   if has('unix')
-    let g:cmd_edited = substitute(g:cmd, "\\(.*\[/\]\\).*", "\\1", "")
+    let g:cmd_edited = substitute(g:cmd, '\(.*[/]\).*', '\1', "")
   else
-    let g:cmd_edited = substitute(g:cmd, "\\(.*\[\\\\]\\).*", "\\1", "")
+    let g:cmd_edited = substitute(g:cmd, '\(.*[\\]\).*', '\1', "")
   endif
   if g:cmd == g:cmd_edited
     if has('unix')
-      let g:cmd_edited = substitute(g:cmd, "\\(.*\[/\]\\).*/", "\\1", "")
+      let g:cmd_edited = substitute(g:cmd, '\(.*[/]\).*/', '\1', "")
     else
-      let g:cmd_edited = substitute(g:cmd, "\\(.*\[\\\\\]\\).*\[\\\\\]", "\\1", "")
+      let g:cmd_edited = substitute(g:cmd, '\(.*[\\\\]\).*[\\\\]', '\1', "")
     endif
   endif
   return g:cmd_edited
@@ -250,13 +239,12 @@ fu! CurrentFileDir(cmd)
 endf
 
 cno $c e <C-\>eCurrentFileDir("e")<cr>
-cno $tc <C-\>eCurrentFileDir("tabnew")<cr>
 
 fu! CurrentWord(cmd)
   return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
 endf
 cno $v <C-\>eCurrentWord("vimgrep")<cr><Home><S-Right><Right><Right>
-map <c-q> :$v
+map <C-q> :$v
 
 " bash like
 cno <C-A> <Home>
@@ -295,18 +283,15 @@ endf
 
 " => Text options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set tabstop=4           " tab spacing
-set softtabstop=4       " unify it
-set shiftwidth=4        " unify it
-set smarttab            " use tabs at start of a line, spaces elsewhere
-set fo=tcrqnmM		      " see help formatoptions (complex)
-set linebreak           " wrap long lines at a character in 'breakat'
-set textwidth=500       " maximum width of text that is being inserted
-set cindent             " do C-style indenting
+set tabstop=4 sts=4 sw=4 " tab spacing
+set smarttab             " use tabs at start of a line, spaces elsewhere
+set linebreak            " wrap long lines at a character in 'breakat'
+set textwidth=500        " maximum width of text that is being inserted
+set smartindent          " do smart autoindenting
 set autoindent
-set smartindent
+set formatoptions+=rnmM
 
-au FileType html,python,vim,javascript setl shiftwidth=2 tabstop=2
+au FileType html,python,vim,javascript setl tabstop=2 sw=2
 
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
