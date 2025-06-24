@@ -243,6 +243,7 @@ cno $c e <C-\>eCurrentFileDir("e")<cr>
 fu! CurrentWord(cmd)
   return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
 endf
+
 cno $v <C-\>eCurrentWord("vimgrep")<cr><Home><S-Right><Right><Right>
 map <C-q> :$v
 
@@ -250,17 +251,14 @@ map <C-q> :$v
 cno <C-A> <Home>
 cno <C-F> <Right>
 cno <C-B> <Left>
-cno <Esc>b <S-Left>
 cno <Esc>f <S-Right>
+cno <Esc>b <S-Left>
 
 " => Buffer related
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has('nvim') | set viminfo+=n~/.shada | else | set viminfo+=!,n~/.viminfo | endif
 
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
-
-" buffer - reverse everything ... :)
-map <F8> ggVGg?
 
 " don't close window when deleting a buffer
 command! Bclose call <SID>BufCloseIt()
@@ -299,7 +297,7 @@ au FileType html,python,vim,javascript setl tabstop=2 sw=2
 noremap <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
 " remove indenting on empty lines
-map <F2> :%s/\s*$//g<cr>:noh<cr>''
+map <F2> :%s/^\s\+$//g<cr>:noh<cr>''
 
 " super paste
 inoremap <C-V> <esc>:set paste<cr>mui<C-R>+<esc>mv'uV'v=:set nopaste<cr>
