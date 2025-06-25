@@ -190,65 +190,41 @@ if !has('gui_running') | set stal=2 | endif
 " switch to current dir
 map <leader>c :cd %:p:h<cr>
 
-" => Editing mappings etc.
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " remap Vim 0
 map 0 ^
 map <A-i> i <esc>r
 
-" move a line of text using control
-nmap <M-j> mz:m+<cr>`z
-nmap <M-k> mz:m-2<cr>`z
-vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
-vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
-
-fu! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
-endf
-au BufWrite *.py :call DeleteTrailingWS()
-
 " => Cmdline settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-fu! DeleteTillSlash()
-  let g:cmd = getcmdline()
-  if has('unix')
-    let g:cmd_edited = substitute(g:cmd, '\(.*[/]\).*', '\1', "")
-  else
-    let g:cmd_edited = substitute(g:cmd, '\(.*[\\]\).*', '\1', "")
-  endif
-  if g:cmd == g:cmd_edited
-    if has('unix')
-      let g:cmd_edited = substitute(g:cmd, '\(.*[/]\).*/', '\1', "")
-    else
-      let g:cmd_edited = substitute(g:cmd, '\(.*[\\\\]\).*[\\\\]', '\1', "")
-    endif
-  endif
-  return g:cmd_edited
-endf
-
-cno $q <C-\>eDeleteTillSlash()<cr>
-
-fu! CurrentFileDir(cmd)
-  return a:cmd .." ".. expand("%:p:h") .."/"
-endf
-
-cno $c e <C-\>eCurrentFileDir("e")<cr>
-
-fu! CurrentWord(cmd)
-  return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
-endf
-
-cno $v <C-\>eCurrentWord("vimgrep")<cr><Home><S-Right><Right><Right>
-map <C-q> :$v
-
 " bash like
 cno <C-A> <Home>
 cno <C-F> <Right>
 cno <C-B> <Left>
 cno <Esc>f <S-Right>
 cno <Esc>b <S-Left>
+
+fu! DeleteTillSlash()
+  let g:cmd = getcmdline()
+  let l:pat = has('unix') ? '\(.*[/]\).*' : '\(.*[\\]\).*'
+  let g:cmd_edited = substitute(g:cmd, l:pat, '\1', "")
+  if g:cmd == g:cmd_edited
+    let l:pat = has('unix') ? '\(.*[/]\).*/' : '\(.*[\\\\]\).*[\\\\]'
+    let g:cmd_edited = substitute(g:cmd, l:pat, '\1', "")
+  endif
+  return g:cmd_edited
+endf
+cno $q <C-\>eDeleteTillSlash()<cr>
+
+fu! CurrentFileDir(cmd)
+  return a:cmd .." ".. expand("%:p:h") .."/"
+endf
+cno $c e <C-\>eCurrentFileDir("e")<cr>
+
+fu! CurrentWord(cmd)
+  return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
+endf
+cno $v <C-\>eCurrentWord("vimgrep")<cr><Home><S-Right><Right><Right>
+map <C-q> :$v
 
 " => Buffer related
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -275,7 +251,7 @@ fu! <SID>BufCloseIt()
   endif
 endf
 
-" => Text options
+" => Text options and handling
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set tabstop=4 sts=4 sw=4 " tab spacing
 set smarttab             " use tabs at start of a line, spaces elsewhere
@@ -285,7 +261,20 @@ set smartindent          " do smart autoindenting
 set autoindent
 set formatoptions+=rnmM
 
+" move a line of text using control
+nmap <M-j> mz:m+<cr>`z
+nmap <M-k> mz:m-2<cr>`z
+vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
+vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
+
 au FileType html,python,vim,javascript setl tabstop=2 sw=2
+
+fu! DeleteTrailingWS()
+  exe "normal mz"
+  %s/\s\+$//ge
+  exe "normal `z"
+endf
+au BufWrite *.py :call DeleteTrailingWS()
 
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
