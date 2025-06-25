@@ -148,7 +148,10 @@ set cursorline
 
 " => Moving around and tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" from an idea by Michael Naumann
+" press * or # to search for the current selection (part of word)
+vnoremap <silent> * :call VisualSearch('f')<cr>
+vnoremap <silent> # :call VisualSearch('b')<cr>
+
 fu! VisualSearch(dir) range
   let l:saved_reg = @"
   exe "normal! vgvy"
@@ -159,10 +162,6 @@ fu! VisualSearch(dir) range
   let @" = l:saved_reg
 endf
 
-" press * or # to search for the current selection (part of word)
-vnoremap <silent> * :call VisualSearch('f')<cr>
-vnoremap <silent> # :call VisualSearch('b')<cr>
-
 map <space> ?
 
 " smart way to switch between windows
@@ -172,11 +171,11 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 map <leader>bd :Bclose<cr>
-map <down> <esc>:Tlist<cr>
 
 " use the arrows to do something useful
 map <right> :bn<cr>
 map <left> :bp<cr>
+map <down> <esc>:Tlist<cr>
 
 " tab configuration
 map <leader>tn :tabnew %<cr>
@@ -186,9 +185,6 @@ map <leader>tm :tabmove
 
 set switchbuf=usetab
 if !has('gui_running') | set stal=2 | endif
-
-" switch to current dir
-map <leader>c :cd %:p:h<cr>
 
 " remap Vim 0
 map 0 ^
@@ -218,7 +214,8 @@ cno $q <C-\>eDeleteTillSlash()<cr>
 fu! CurrentFileDir(cmd)
   return a:cmd .." ".. expand("%:p:h") .."/"
 endf
-cno $c e <C-\>eCurrentFileDir("e")<cr>
+cno $c <C-\>eCurrentFileDir("e")<cr>
+map <leader>c :cd %:p:h<cr>
 
 fu! CurrentWord(cmd)
   return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
@@ -230,25 +227,16 @@ map <C-q> :$v
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has('nvim') | set viminfo+=n~/.shada | else | set viminfo+=!,n~/.viminfo | endif
 
-au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
+au BufReadPost * if line("'\"") > 0|exe line("'\"") <= line("$") ? "norm '\"" : "norm $"|endif
 
 " don't close window when deleting a buffer
 command! Bclose call <SID>BufCloseIt()
 
 fu! <SID>BufCloseIt()
-  let l:curr_bufnr = bufnr("%")
-
-  if buflisted(bufnr("#"))
-    buffer #
-  else
-    bnext
-  endif
-  if bufnr("%") == l:curr_bufnr
-    new
-  endif
-  if buflisted(l:curr_bufnr)
-    execute("bdelete! ".. l:curr_bufnr)
-  endif
+  let l:cbufnr = bufnr("%")
+  exe buflisted(bufnr("#")) ? "buffer #" : "bnext"
+  exe 'if bufnr("%") == l:cbufnr | new | endif'
+  exe 'if buflisted(l:cbufnr) | execute("bdelete! ".. l:cbufnr) | endif'
 endf
 
 " => Text options and handling
