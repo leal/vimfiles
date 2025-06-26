@@ -64,8 +64,6 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#buffer_nr_show = 1
-let g:airline#extensions#disable_rtp_load = 1
-let g:airline_extensions = ['tabline', 'keymap', 'quickfix', ]
 
 if g:airline_powerline_fonts
   if has('win32')
@@ -146,7 +144,7 @@ set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$
                         " how :set list show
 set cursorline
 
-" => Moving around and tabs
+" => Moving around
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " press * or # to search for the current selection (part of word)
 vnoremap <silent> * :call VisualSearch('f')<cr>
@@ -170,25 +168,13 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-map <leader>bd :Bclose<cr>
-
 " use the arrows to do something useful
 map <right> :bn<cr>
 map <left> :bp<cr>
 map <down> <esc>:Tlist<cr>
 
-" tab configuration
-map <leader>tn :tabnew %<cr>
-map <leader>te :tabedit
-map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove
-
-set switchbuf=usetab
-if !has('gui_running') | set stal=2 | endif
-
 " remap Vim 0
 map 0 ^
-map <A-i> i <esc>r
 
 " => Cmdline settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -212,10 +198,10 @@ endf
 cno $q <C-\>eDeleteTillSlash()<cr>
 
 fu! CurrentFileDir(cmd)
-  return a:cmd .." ".. expand("%:p:h") .."/"
+  return a:cmd .." ".. expand("%:p:h") ..(has('win32') ? "\\" : "/")
 endf
 cno $c <C-\>eCurrentFileDir("e")<cr>
-map <leader>c :cd %:p:h<cr>
+map <leader>c :<C-\>eCurrentFileDir("cd")<cr><cr>
 
 fu! CurrentWord(cmd)
   return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
@@ -223,21 +209,31 @@ endf
 cno $v <C-\>eCurrentWord("vimgrep")<cr><Home><S-Right><Right><Right>
 map <C-q> :$v
 
-" => Buffer related
+" => Buffer and tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has('nvim') | set viminfo+=n~/.shada | else | set viminfo+=!,n~/.viminfo | endif
 
-au BufReadPost * if line("'\"") > 0|exe line("'\"") <= line("$") ? "norm '\"" : "norm $"|endif
+au BufReadPost * exe (line("'\"") > 0 && line("'\"") <= line("$")) ? "norm '\"" : "norm $"
 
 " don't close window when deleting a buffer
+map <leader>bd :Bclose<cr>
 command! Bclose call <SID>BufCloseIt()
 
 fu! <SID>BufCloseIt()
   let l:cbufnr = bufnr("%")
   exe buflisted(bufnr("#")) ? "buffer #" : "bnext"
-  exe 'if bufnr("%") == l:cbufnr | new | endif'
-  exe 'if buflisted(l:cbufnr) | execute("bdelete! ".. l:cbufnr) | endif'
+  exe bufnr("%") == l:cbufnr ? "new" : ""
+  exe buflisted(l:cbufnr) ? ("bdelete! ".. l:cbufnr) : ""
 endf
+
+" tab configuration
+map <leader>tn :tabnew %<cr>
+map <leader>te :tabedit
+map <leader>tc :tabclose<cr>
+map <leader>tm :tabmove
+
+set switchbuf=usetab
+if !has('gui_running') | set stal=2 | endif
 
 " => Text options and handling
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -254,6 +250,8 @@ nmap <M-j> mz:m+<cr>`z
 nmap <M-k> mz:m-2<cr>`z
 vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
 vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
+
+map <A-i> i <esc>r
 
 au FileType html,python,vim,javascript setl tabstop=2 sw=2
 
@@ -275,7 +273,7 @@ map <F2> :%s/^\s\+$//g<cr>:noh<cr>''
 " super paste
 inoremap <C-V> <esc>:set paste<cr>mui<C-R>+<esc>mv'uV'v=:set nopaste<cr>
 
-" select range, hit :call SuperRetab($width) - by p0g and FallingCow
+" select range, hit :call SuperRetab($width)
 fu! SuperRetab(width) range
   sil! exe a:firstline ..','.. a:lastline ..'s/\v%(^ *)@<= {'.. a:width ..'}/\t/g'
 endf
