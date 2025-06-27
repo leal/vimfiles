@@ -10,9 +10,9 @@ if !has('nvim')
   set nocompatible      " use vim as vim, put at the very start
   set browsedir=buffer  " use the directory of the related buffer
   set pastetoggle=<F3>  " when pasting something in, don't indent
-  set history=100       " lines of Ex commands, search history ...
-  set autoread          " auto read when a file is changed outside
+  set history=100       " lines of ':' commands, search history...
   set laststatus=2      " always show the status line
+  set autoread          " auto read when a file is changed outside
 endif
 set clipboard+=unnamed  " use register '*' for all y, d, c, p ops
 set isk+=$,%,#          " none of these should be word dividers
@@ -20,22 +20,21 @@ set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
 lan mes zh_CN.utf-8     " for encoding=utf-8
+set mouse=a             " except TERM screen & SecureCRT's linux
+set nowritebackup
+set noswapfile
 
-let dotor_ = has('win32') ? '_' : '.'
-let $VIMRC   = $HOME ..'/'.. dotor_ ..'vimrc'
+let mapleader = ','     " map <leader> will be ,
+let g:mapleader = ','
+
+let $VIMRC   = $HOME ..'/'.. (has('win32') ? '_' : '.') ..'vimrc'
 let $vimdata = $HOME ..'/.vim/data'
 let $plugged = $HOME ..'/.vim/plug'
 set runtimepath+=$plugged
 
-set nowritebackup
-set noswapfile
-
-let mapleader = ","     " map <leader> will be ,
-let g:mapleader = ","
-
 " => Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" disable some Vim built-in rtp plugins
+" disable some built-in rtp plugins
 let g:loaded_vimballPlugin   = 1
 let g:loaded_vimball         = 1
 let g:loaded_getscriptPlugin = 1
@@ -56,8 +55,7 @@ Plug 'junegunn/vim-easy-align', { 'on': [] }
 Plug 'junegunn/fzf', { 'on': ['FZF'], 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim', { 'on': [] }
 Plug 'easymotion/vim-easymotion', { 'on': [] }
-call plug#end()
-" automatically executes filetype plugin indent on and syntax enable
+call plug#end() " also executes filetype on and syntax enable
 
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -77,7 +75,7 @@ else
   endif
 endif
 
-let Tlist_Sort_Type = "name"         " taglist.vim, order by
+let Tlist_Sort_Type = 'name'         " taglist.vim, order by
 let Tlist_Use_Right_Window = 1       " split to the right side
 let Tlist_Compact_Format = 1         " show small meny
 let Tlist_Exit_OnlyWindow = 1        " if it's the last, kill it
@@ -86,14 +84,10 @@ map <leader>t :Tlist<cr>
 
 let g:yankring_history_dir = expand('$vimdata')
 map <leader>y :YRShow<cr>
-
-if $TERM != "linux" && $TERM != "screen"
-  set mouse=a           " except screen & SecureCRT's linux terminal
-endif
-                        " fast saving
-nmap <leader>w :w!<cr>
                         " fast editing of the .vimrc
 map <leader>e :e! $VIMRC<cr>
+                        " fast saving
+nmap <leader>w :w!<cr>
 
 set ffs=unix,dos        " behaves good on both linux and windows
 nmap <leader>fd :se ff=dos<cr>
@@ -151,13 +145,13 @@ vnoremap <silent> * :call VisualSearch('f')<cr>
 vnoremap <silent> # :call VisualSearch('b')<cr>
 
 fu! VisualSearch(dir) range
-  let l:saved_reg = @"
-  exe "normal! vgvy"
-  let l:pattern = escape(@", '\\/.*$^~[]')
-  let l:pattern = substitute(l:pattern, "\n$", "", "")
-  exe "normal ".. (a:dir == 'b' ? "?" : "/") .. l:pattern .."^M"
-  let @/ = l:pattern
-  let @" = l:saved_reg
+  let l:reg = @"
+  exe 'normal! vgvy'
+  let l:pat = escape(@", '\\/.*$^~[]')
+  let l:pat = substitute(l:pat, '\n$', '', '')
+  exe 'normal '.. (a:dir == 'b' ? '?' : '/') .. l:pat ..'^M'
+  let @/ = l:pat
+  let @" = l:reg
 endf
 
 map <space> ?
@@ -173,7 +167,7 @@ map <right> :bn<cr>
 map <left> :bp<cr>
 map <down> <esc>:Tlist<cr>
 
-" remap Vim 0
+" remap vim 0
 map 0 ^
 
 " => Cmdline settings
@@ -187,26 +181,26 @@ cno <Esc>b <S-Left>
 
 fu! DeleteTillSlash()
   let g:cmd = getcmdline()
-  let l:pat = has('unix') ? '\(.*[/]\).*' : '\(.*[\\]\).*'
-  let g:cmd_edited = substitute(g:cmd, l:pat, '\1', "")
+  let l:pat = has('win32') ? '\(.*[\\]\).*' : '\(.*[/]\).*'
+  let g:cmd_edited = substitute(g:cmd, l:pat, '\1', '')
   if g:cmd == g:cmd_edited
-    let l:pat = has('unix') ? '\(.*[/]\).*/' : '\(.*[\\\\]\).*[\\\\]'
-    let g:cmd_edited = substitute(g:cmd, l:pat, '\1', "")
+    let l:pat = has('win32') ? '\(.*[\\\\]\).*[\\\\]' : '\(.*[/]\).*/'
+    let g:cmd_edited = substitute(g:cmd, l:pat, '\1', '')
   endif
   return g:cmd_edited
 endf
 cno $q <C-\>eDeleteTillSlash()<cr>
 
 fu! CurrentFileDir(cmd)
-  return a:cmd .." ".. expand("%:p:h") ..(has('win32') ? "\\" : "/")
+  return a:cmd ..' '.. expand('%:p:h') .. (has('win32') ? '\' : '/')
 endf
-cno $c <C-\>eCurrentFileDir("e")<cr>
-map <leader>c :<C-\>eCurrentFileDir("cd")<cr><cr>
+cno $c <C-\>eCurrentFileDir('e')<cr>
+map <leader>c :<C-\>eCurrentFileDir('cd')<cr><cr>
 
 fu! CurrentWord(cmd)
-  return a:cmd .." /".. expand("<cword>") .."/ ".."*.h *.c"
+  return a:cmd ..' /'.. expand('<cword>') ..'/ '..'*.h *.c'
 endf
-cno $v <C-\>eCurrentWord("vimgrep")<cr><Home><S-Right><Right><Right>
+cno $v <C-\>eCurrentWord('vimgrep')<cr><Home><S-Right><Right><Right>
 map <C-q> :$v
 
 " => Buffer and tabs
@@ -220,14 +214,12 @@ map <leader>bd :Bclose<cr>
 command! Bclose call <SID>BufCloseIt()
 
 fu! <SID>BufCloseIt()
-  let l:cbufnr = bufnr("%")
-  exe buflisted(bufnr("#")) ? "buffer #" : "bnext"
-  exe bufnr("%") == l:cbufnr ? "new" : ""
-  exe buflisted(l:cbufnr) ? ("bdelete! ".. l:cbufnr) : ""
+  let l:cbufnr = bufnr('%')
+  exe buflisted(bufnr('#')) ? 'buffer #' : 'bnext'
+  exe bufnr('%') != l:cbufnr ?? 'new'
+  exe !buflisted(l:cbufnr) ?? ('bdelete! '.. l:cbufnr)
 endf
 
-" tab configuration
-map <leader>tn :tabnew %<cr>
 map <leader>te :tabedit
 map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
@@ -235,7 +227,7 @@ map <leader>tm :tabmove
 set switchbuf=usetab
 if !has('gui_running') | set stal=2 | endif
 
-" => Text options and handling
+" => Text options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set tabstop=4 sts=4 sw=4 " tab spacing
 set smarttab             " use tabs at start of a line, spaces elsewhere
@@ -256,9 +248,9 @@ map <A-i> i <esc>r
 au FileType html,python,vim,javascript setl tabstop=2 sw=2
 
 fu! DeleteTrailingWS()
-  exe "normal mz"
+  exe 'normal mz'
   %s/\s\+$//ge
-  exe "normal `z"
+  exe 'normal `z'
 endf
 au BufWrite *.py :call DeleteTrailingWS()
 
@@ -273,12 +265,12 @@ map <F2> :%s/^\s\+$//g<cr>:noh<cr>''
 " super paste
 inoremap <C-V> <esc>:set paste<cr>mui<C-R>+<esc>mv'uV'v=:set nopaste<cr>
 
-" select range, hit :call SuperRetab($width)
+" select range, hit :call SuperRetab(width)
 fu! SuperRetab(width) range
   sil! exe a:firstline ..','.. a:lastline ..'s/\v%(^ *)@<= {'.. a:width ..'}/\t/g'
 endf
 
-" :call libcallnr("vimtweak64.dll", "EnableMaximize", 1)
+" :call libcallnr('vimtweak64.dll', 'EnableMaximize', 1)
 if has('win32') && has('gui_running')
   fu! SetAlpha(alpha)
     sil! exe ':call libcallnr("vimtweak64.dll", "SetAlpha", '.. a:alpha ..')'
