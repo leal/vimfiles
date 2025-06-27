@@ -2,7 +2,6 @@
 "  \\|//  leal @github  version 1.2506, since 1.0501
 "   o o   Thanks: Amix @github, MetaCosm, Sydney
 "    U    vim-plug rules, install git, fzf, ctags, ripgrep
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " => General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -13,6 +12,7 @@ if !has('nvim')
   set history=100       " lines of ':' commands, search history...
   set laststatus=2      " always show the status line
   set autoread          " auto read when a file is changed outside
+  set hidden            " allow to change buffer without saving
 endif
 set clipboard+=unnamed  " use register '*' for all y, d, c, p ops
 set isk+=$,%,#          " none of these should be word dividers
@@ -113,12 +113,10 @@ endif
 if v:version >= 900
   set wildoptions=pum   " possible completions in popup menu
 endif
-set completeopt=menu    " possible ins completions in popup menu
-set scrolloff=7         " minimal screen lines above/below cursor
 set wildmenu            " :h and press <Tab> to see what happens
-set wig=*.o,*.pyc       " type of file that will not in wildmenu
+set wig+=*.o,*.pyc      " type of file that will not in wildmenu
+set scrolloff=7         " minimal screen lines above/below cursor
 set ruler               " show current position along the bottom
-set hidden              " allow to change buffer without saving
 set backspace=2         " make backspace work normal
 set whichwrap+=<,>,h,l  " allow backspace and cursor keys to wrap
 set shortmess=atI       " shorten to avoid 'press a key' prompt
@@ -137,16 +135,15 @@ set cursorline
 
 " => Moving around
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" press * or # to search for the current selection (part of word)
-vnoremap <silent> * :call VisualSearch('f')<cr>
-vnoremap <silent> # :call VisualSearch('b')<cr>
+" press * to search for v-mode current selection
+vn <silent> * :call VisualSearch('f')<cr>
 
 fu! VisualSearch(dir) range
   let l:reg = @"
   exe 'normal! vgvy'
   let l:pat = escape(@", '\\/.*$^~[]')
   let l:pat = substitute(l:pat, '\n$', '', '')
-  exe 'normal '.. (a:dir == 'b' ? '?' : '/') .. l:pat ..'^M'
+  exe 'normal '.. (a:dir == 'f' ? '/' : '?') .. l:pat ..'^M'
   let @/ = l:pat
   let @" = l:reg
 endf
@@ -202,9 +199,9 @@ map <C-q> :$v
 
 " => Buffer and tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has('nvim') | set viminfo+=n~/.shada | else | set viminfo+=!,n~/.viminfo | endif
+if has('nvim') | set viminfo+=n~/.shada |else| set viminfo+=!,n~/.viminfo |endif
 
-au BufReadPost * exe (line("'\"") > 0 && line("'\"") <= line("$")) ? "norm '\"" : "norm $"
+au BufReadPost * exe (line('''"') > 0 && line('''"') <= line('$')) ? 'norm ''"' : 'norm $'
 
 " don't close window when deleting a buffer
 map <leader>bd :Bclose<cr>
@@ -241,8 +238,6 @@ vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
 vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 
 map <A-i> i <esc>r
-
-au FileType html,python,vim,javascript setl tabstop=2 sw=2
 
 fu! DeleteTrailingWS()
   exe 'normal mz'
@@ -281,4 +276,4 @@ augroup lazy_load
   au InsertEnter * call plug#load('supertab', 'YankRing.vim', 'fzf', 'fzf.vim') | au! lazy_load
 augroup end
 
-" vim: set et ft=vim tw=78 tags+=$VIMRUNTIME/doc/tags:
+" vim: set et ft=vim tw=78 ts=2 sw=2 tags+=$VIMRUNTIME/doc/tags:
