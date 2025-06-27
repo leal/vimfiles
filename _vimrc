@@ -19,6 +19,7 @@ set isk+=$,%,#          " none of these should be word dividers
 set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
+set ffs=unix,dos        " behaves good on both linux and windows
 lan mes zh_CN.utf-8     " for encoding=utf-8
 set mouse=a             " except TERM screen & SecureCRT's linux
 set nowritebackup
@@ -31,6 +32,10 @@ let $VIMRC   = $HOME ..'/'.. (has('win32') ? '_' : '.') ..'vimrc'
 let $vimdata = $HOME ..'/.vim/data'
 let $plugged = $HOME ..'/.vim/plug'
 set runtimepath+=$plugged
+                        " fast editing of .vimrc & saving
+nmap <leader>e :e! $VIMRC<cr>
+nmap <leader>w :w!<cr>
+nmap <leader>fu :se ff=unix<cr>
 
 " => Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -84,14 +89,6 @@ map <leader>t :Tlist<cr>
 
 let g:yankring_history_dir = expand('$vimdata')
 map <leader>y :YRShow<cr>
-                        " fast editing of the .vimrc
-map <leader>e :e! $VIMRC<cr>
-                        " fast saving
-nmap <leader>w :w!<cr>
-
-set ffs=unix,dos        " behaves good on both linux and windows
-nmap <leader>fd :se ff=dos<cr>
-nmap <leader>fu :se ff=unix<cr>
 
 " => Visual cues
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
