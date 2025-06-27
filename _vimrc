@@ -12,7 +12,7 @@ if !has('nvim')
   set history=100       " lines of ':' commands, search history...
   set laststatus=2      " always show the status line
   set autoread          " auto read when a file is changed outside
-  set hidden            " allow to change buffer without saving
+  set hidden            " allow to change buffer w/o saving
 endif
 set clipboard+=unnamed  " use register '*' for all y, d, c, p ops
 set isk+=$,%,#          " none of these should be word dividers
@@ -97,6 +97,7 @@ if has('gui_running')
   winpos 50 50 | set lines=38 columns=150
   colo molokai
 else
+  set showtabline=2     " always show the line
   set background=light  " before coloscheme
   set termguicolors     " might need only on windows, set t_Co=256?
   colo desert
@@ -148,7 +149,9 @@ fu! VisualSearch(dir) range
   let @" = l:reg
 endf
 
-map <space> ?
+" remap vim 0, space
+map 0 ^
+map <Space> ?
 
 " smart way to switch between windows
 map <C-j> <C-W>j
@@ -157,12 +160,9 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 " use the arrows to do something useful
-map <right> :bn<cr>
-map <left> :bp<cr>
-map <down> <esc>:Tlist<cr>
-
-" remap vim 0
-map 0 ^
+map <Right> :bn<cr>
+map <Left> :bp<cr>
+map <Down> <Esc>:Tlist<cr>
 
 " => Cmdline settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -195,17 +195,16 @@ fu! CurrentWord(cmd)
   return a:cmd ..' /'.. expand('<cword>') ..'/ '..'*.h *.c'
 endf
 cno $v <C-\>eCurrentWord('vimgrep')<cr><Home><S-Right><Right><Right>
-map <C-q> :$v
+map <C-Q> :$v
 
 " => Buffer and tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has('nvim') | set viminfo+=n~/.shada |else| set viminfo+=!,n~/.viminfo |endif
+exe 'set viminfo+='.. (has('nvim') ? 'n~/.shada' : '!,n~/.viminfo')
 
 au BufReadPost * exe (line('''"') > 0 && line('''"') <= line('$')) ? 'norm ''"' : 'norm $'
 
 " don't close window when deleting a buffer
-map <leader>bd :Bclose<cr>
-command! Bclose call <SID>BufCloseIt()
+map <leader>bd :call <SID>BufCloseIt()<cr>
 
 fu! <SID>BufCloseIt()
   let l:cbufnr = bufnr('%')
@@ -219,7 +218,6 @@ map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
 
 set switchbuf=usetab
-if !has('gui_running') | set stal=2 | endif
 
 " => Text options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -237,7 +235,7 @@ nmap <M-k> mz:m-2<cr>`z
 vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
 vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 
-map <A-i> i <esc>r
+map <A-i> i <Esc>r
 
 fu! DeleteTrailingWS()
   exe 'normal mz'
@@ -249,13 +247,13 @@ au BufWrite *.py :call DeleteTrailingWS()
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " remove the windows ^M
-noremap <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+nor <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
 " remove indenting on empty lines
 map <F2> :%s/^\s\+$//g<cr>:noh<cr>''
 
 " super paste
-inoremap <C-V> <esc>:set paste<cr>mui<C-R>+<esc>mv'uV'v=:set nopaste<cr>
+ino <C-V> <Esc>:set paste<cr>mui<C-R>+<Esc>mv'uV'v=:set nopaste<cr>
 
 " select range, hit :call SuperRetab(width)
 fu! SuperRetab(width) range
