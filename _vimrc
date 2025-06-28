@@ -1,6 +1,6 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  \\|//  leal @github  version 1.2506, since 1.0501
-"   o o   Thanks: Amix @github, MetaCosm, Sydney
+"   o o   Thanks to Amix @github, MetaCosm, Sydney
 "    U    vim-plug rules, install git, fzf, ctags, ripgrep
 
 " => General
@@ -8,7 +8,7 @@
 if !has('nvim')
   set nocompatible      " use vim as vim, put at the very start
   set browsedir=buffer  " use the directory of the related buffer
-  set pastetoggle=<F3>  " when pasting something in, don't indent
+  set pastetoggle=<F3>  " don't indent when pasting something in
   set history=100       " lines of ':' commands, search history...
   set laststatus=2      " always show the status line
   set autoread          " auto read when a file is changed outside
@@ -19,9 +19,9 @@ set isk+=$,%,#          " none of these should be word dividers
 set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
-set ffs=unix,dos        " behaves good on both linux and windows
+set ffs=unix,dos        " behave good on macos, linux and windows
 lan mes zh_CN.utf-8     " for encoding=utf-8
-set mouse=a             " except TERM screen & SecureCRT's linux
+set mouse=a             " except TERM screen, SecureCRT linux
 set nowritebackup
 set noswapfile
 
@@ -60,7 +60,7 @@ Plug 'junegunn/vim-easy-align', { 'on': [] }
 Plug 'junegunn/fzf', { 'on': ['FZF'], 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim', { 'on': [] }
 Plug 'easymotion/vim-easymotion', { 'on': [] }
-call plug#end() " also executes filetype on and syntax enable
+call plug#end() " also execute filetype on and syntax enable
 
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -80,11 +80,11 @@ else
   endif
 endif
 
-let Tlist_Sort_Type = 'name'         " taglist.vim, order by
-let Tlist_Use_Right_Window = 1       " split to the right side
-let Tlist_Compact_Format = 1         " show small meny
-let Tlist_Exit_OnlyWindow = 1        " if it's the last, kill it
-let Tlist_Enable_Fold_Column = 0     " do not show folding tree
+let Tlist_Sort_Type = 'name'     " order by, taglist.vim
+let Tlist_Compact_Format = 1
+let Tlist_Exit_OnlyWindow = 1
+let Tlist_Use_Right_Window = 1
+let Tlist_Enable_Fold_Column = 0
 map <leader>t :Tlist<cr>
 
 let g:yankring_history_dir = expand('$vimdata')
@@ -98,15 +98,15 @@ if has('gui_running')
   colo molokai
 else
   set showtabline=2     " always show the line
-  set background=light  " before coloscheme
-  set termguicolors     " might need only on windows, set t_Co=256?
+  set background=light  " placed before coloscheme
+  set termguicolors     " need only on windows? set t_Co=256?
   colo desert
 
   highlight Normal guibg=NONE ctermbg=NONE
   highlight NonText guibg=NONE ctermbg=NONE
 endif
 
-if v:version >= 700     " popmenu color setting
+if v:version >= 700     " popmenu color settings
   hi Pmenu guibg=#333333
   hi PmenuSel guibg=#555555 guifg=#ffffff
 endif
@@ -115,7 +115,7 @@ if v:version >= 900
   set wildoptions=pum   " possible completions in popup menu
 endif
 set wildmenu            " :h and press <Tab> to see what happens
-set wig+=*.o,*.pyc      " type of file that will not in wildmenu
+set wig+=*.o,*.pyc      " the file patterns ignored in wildmenu
 set scrolloff=7         " minimal screen lines above/below cursor
 set ruler               " show current position along the bottom
 set backspace=2         " make backspace work normal
@@ -125,8 +125,8 @@ set report=0            " tell us when anything is changed via :...
 set fillchars=vert:\ ,stl:\ ,stlnc:\ 
                         " make splitters between windows be blank
 set showmatch           " show matching paren when a bracket inserted
-set ignorecase          " the case of normal letters is ignored
-set hlsearch            " highlight all searched for phrases
+set ignorecase          " ignore the case of normal letters
+set hlsearch            " highlight all the searched phrases
 set incsearch           " highlight where the typed pattern matches
 map <silent> <leader><cr> :noh<cr>
                         " remove the highlight searched phrases
@@ -141,10 +141,10 @@ vn <silent> * :call VisualSearch('f')<cr>
 
 fu! VisualSearch(dir) range
   let l:reg = @"
-  exe 'normal! vgvy'
+  exe 'norm! vgvy'
   let l:pat = escape(@", '\\/.*$^~[]')
   let l:pat = substitute(l:pat, '\n$', '', '')
-  exe 'normal '.. (a:dir == 'f' ? '/' : '?') .. l:pat ..'^M'
+  exe 'norm '.. (a:dir == 'f' ? '/' : '?') .. l:pat ..'^M'
   let @/ = l:pat
   let @" = l:reg
 endf
@@ -238,9 +238,9 @@ vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 map <A-i> i <Esc>r
 
 fu! DeleteTrailingWS()
-  exe 'normal mz'
+  exe 'norm mz'
   %s/\s\+$//ge
-  exe 'normal `z'
+  exe 'norm `z'
 endf
 au BufWrite *.py :call DeleteTrailingWS()
 
@@ -255,7 +255,7 @@ map <F2> :%s/^\s\+$//g<cr>:noh<cr>''
 " super paste
 ino <C-V> <Esc>:set paste<cr>mui<C-R>+<Esc>mv'uV'v=:set nopaste<cr>
 
-" select range, hit :call SuperRetab(width)
+" select range, hit :call Sup...
 fu! SuperRetab(width) range
   sil! exe a:firstline ..','.. a:lastline ..'s/\v%(^ *)@<= {'.. a:width ..'}/\t/g'
 endf
@@ -270,8 +270,9 @@ endif
 
 augroup lazy_load
   au!
-  au InsertEnter * call plug#load('vim-easy-align', 'vim-airline-themes', 'vim-easymotion')
-  au InsertEnter * call plug#load('supertab', 'YankRing.vim', 'fzf', 'fzf.vim') | au! lazy_load
+  au InsertEnter * call plug#load('vim-airline-themes', 'vim-easymotion')
+  au InsertEnter * call plug#load('vim-easy-align', 'YankRing.vim', 'fzf')
+  au InsertEnter * call plug#load('supertab', 'fzf.vim') | au! lazy_load
 augroup end
 
 " vim: set et ft=vim tw=78 ts=2 sw=2 tags+=$VIMRUNTIME/doc/tags:
