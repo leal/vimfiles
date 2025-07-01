@@ -237,12 +237,8 @@ vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 
 map <A-i> i <Esc>r
 
-fu! DeleteTrailingWS()
-  exe 'norm mz'
-  %s/\s\+$//ge
-  exe 'norm `z'
-endf
-au BufWrite *.py :call DeleteTrailingWS()
+" remove trailing whitespace
+au BufWrite *.py :exe 'norm mz' | %s/\s\+$//ge | exe 'norm `z'
 
 " => Misc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
