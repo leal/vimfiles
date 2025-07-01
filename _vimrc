@@ -74,7 +74,7 @@ if g:airline_powerline_fonts
     set gfw=Maple_Mono_NF_CN:h11:cGB2312
   endif
 else
-  set statusline=\ %F%m%r%h\ %w\ %{&ff}\ \ now:\ %r%{getcwd()}%h\ \ \ pos:\ %l/%L:%c
+  set statusline=%F%m%w\ %{getcwd()}%=%{&ft},%{&fenc}\ %p%%\ %l,%c/%L
   if has('win32')
     set gfn=Consolas:h12:cANSI
   endif
