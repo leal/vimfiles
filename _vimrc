@@ -1,5 +1,5 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"  \\|//  leal @github  version 1.2506, since 1.0501
+"  \\|//  leal @github  version 1.2507, since 1.0501
 "   o o   Thanks to Amix @github, MetaCosm, Sydney
 "    U    vim-plug rules, install git, fzf, ctags, ripgrep
 
@@ -9,8 +9,9 @@ if !has('nvim')
   set nocompatible      " use vim as vim, put at the very start
   set browsedir=buffer  " use the directory of the related buffer
   set pastetoggle=<F3>  " don't indent when pasting something in
-  set history=100       " lines of ':' commands, search history...
+  set history=100       " lines of ':' commands, search history
   set laststatus=2      " always show the status line
+  set backspace=2       " make backspace work normal
   set autoread          " auto read when a file is changed outside
   set hidden            " allow to change buffer w/o saving
 endif
@@ -19,7 +20,7 @@ set isk+=$,%,#          " none of these should be word dividers
 set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
-set ffs=unix,dos        " behave good on macos, linux and windows
+set ffs=unix,dos        " behave good on diffrent os
 lan mes zh_CN.utf-8     " for encoding=utf-8
 set mouse=a             " except TERM screen, SecureCRT linux
 set nowritebackup
@@ -28,11 +29,11 @@ set noswapfile
 let mapleader = ','     " map <leader> will be ,
 let g:mapleader = ','
 
-let $VIMRC   = $HOME ..'/'.. (has('win32') ? '_' : '.') ..'vimrc'
+let $VIMRC   = $HOME .. (has('win32') ? '\_' : '/.') ..'vimrc'
 let $vimdata = $HOME ..'/.vim/data'
 let $plugged = $HOME ..'/.vim/plug'
 set runtimepath+=$plugged
-                        " fast editing of .vimrc & saving
+                        " fast editing of vimrc & saving
 nmap <leader>e :e! $VIMRC<cr>
 nmap <leader>w :w!<cr>
 nmap <leader>fu :se ff=unix<cr>
@@ -67,20 +68,9 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#buffer_nr_show = 1
+au User AirlineToggledOff :set stl=%F%m%w\ %{getcwd()}%=%{&ft},%{&fenc}\ %p%%\ %l,%c/%L
 
-if g:airline_powerline_fonts
-  if has('win32')
-    set gfn=Maple_Mono_NF:h11:cANSI:qDRAFT
-    set gfw=Maple_Mono_NF_CN:h11:cGB2312
-  endif
-else
-  set statusline=%F%m%w\ %{getcwd()}%=%{&ft},%{&fenc}\ %p%%\ %l,%c/%L
-  if has('win32')
-    set gfn=Consolas:h12:cANSI
-  endif
-endif
-
-let Tlist_Sort_Type = 'name'     " order by, taglist.vim
+let Tlist_Sort_Type = 'name'   " order by, taglist.vim
 let Tlist_Compact_Format = 1
 let Tlist_Exit_OnlyWindow = 1
 let Tlist_Use_Right_Window = 1
@@ -92,14 +82,19 @@ map <leader>y :YRShow<cr>
 
 " => Visual cues
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has('win32')
+  set gfn=Maple_Mono_NF:h11:cANSI:qDRAFT
+  set gfw=Maple_Mono_NF_CN:h11:cGB2312
+endif
+
 if has('gui_running')
   set guioptions-=r | set guioptions-=L | set guioptions-=T
   winpos 50 50 | set lines=38 columns=150
   colo molokai
 else
   set showtabline=2     " always show the line
-  set background=light  " placed before coloscheme
-  set termguicolors     " need only on windows? set t_Co=256?
+  set background=light  " before colo
+  set termguicolors     " set t_Co=256?
   colo desert
 
   highlight Normal guibg=NONE ctermbg=NONE
@@ -118,8 +113,6 @@ set wildmenu            " :h and press <Tab> to see what happens
 set wig+=*.o,*.pyc      " the file patterns ignored in wildmenu
 set scrolloff=7         " minimal screen lines above/below cursor
 set ruler               " show current position along the bottom
-set backspace=2         " make backspace work normal
-set whichwrap+=<,>,h,l  " allow backspace and cursor keys to wrap
 set shortmess=atI       " shorten to avoid 'press a key' prompt
 set report=0            " tell us when anything is changed via :...
 set fillchars=vert:\ ,stl:\ ,stlnc:\ 
@@ -149,24 +142,22 @@ fu! VisualSearch(dir) range
   let @" = l:reg
 endf
 
-" remap vim 0, space
+" remap vim 0, space, arrows
 map 0 ^
 map <Space> ?
+map <Right> :bn<cr>
+map <Left> :bp<cr>
+map <Down> <Esc>:Tlist<cr>
 
-" smart way to switch between windows
+" switch between windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" use the arrows to do something useful
-map <Right> :bn<cr>
-map <Left> :bp<cr>
-map <Down> <Esc>:Tlist<cr>
-
 " => Cmdline settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" bash like
+" bash-like moving
 cno <C-A> <Home>
 cno <C-F> <Right>
 cno <C-B> <Left>
@@ -201,7 +192,7 @@ map <C-Q> :$v
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 exe 'set viminfo+='.. (has('nvim') ? 'n~/.shada' : '!,n~/.viminfo')
 
-au BufReadPost * exe (line('''"') > 0 && line('''"') <= line('$')) ? 'norm ''"' : 'norm $'
+au BufReadPost * exe (line('''"') > 0 && line('''"') <= line('$')) ? 'norm `"' : 'norm $'
 
 " don't close window when deleting a buffer
 map <leader>bd :call <SID>BufCloseIt()<cr>
@@ -215,17 +206,16 @@ endf
 
 map <leader>te :tabedit
 map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove
 
 set switchbuf=usetab
 
 " => Text options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set tabstop=4 sts=4 sw=4 " tab spacing
-set smarttab             " use tabs at start of a line, spaces elsewhere
+set sw=4 ts=4 sts=4      " tab spacing
+set smarttab             " tab 'sw' in front of a line, else ts, sts
 set linebreak            " wrap long lines at a character in 'breakat'
-set textwidth=500        " maximum width of text that is being inserted
-set smartindent          " do smart autoindenting
+set textwidth=500        " maximum width of text being inserted
+set smartindent          " when starting a new line
 set autoindent
 set formatoptions+=rnmM
 
@@ -237,7 +227,7 @@ vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 
 map <A-i> i <Esc>r
 
-" remove trailing whitespace
+" remove trailing blanks
 au BufWrite *.py :exe 'norm mz' | %s/\s\+$//ge | exe 'norm `z'
 
 " => Misc
@@ -251,12 +241,10 @@ map <F2> :%s/^\s\+$//g<cr>:noh<cr>''
 " super paste
 ino <C-V> <Esc>:set paste<cr>mui<C-R>+<Esc>mv'uV'v=:set nopaste<cr>
 
-" select range, hit :call Sup...
 fu! SuperRetab(width) range
   sil! exe a:firstline ..','.. a:lastline ..'s/\v%(^ *)@<= {'.. a:width ..'}/\t/g'
 endf
 
-" :call libcallnr('vimtweak64.dll', 'EnableMaximize', 1)
 if has('win32') && has('gui_running')
   fu! SetAlpha(alpha)
     sil! exe ':call libcallnr("vimtweak64.dll", "SetAlpha", '.. a:alpha ..')'
@@ -264,8 +252,7 @@ if has('win32') && has('gui_running')
   au VimEnter * call SetAlpha(210)
 endif
 
-augroup lazy_load
-  au!
+augroup lazy_load | au!
   au InsertEnter * call plug#load('vim-airline-themes', 'vim-easymotion')
   au InsertEnter * call plug#load('vim-easy-align', 'YankRing.vim', 'fzf')
   au InsertEnter * call plug#load('supertab', 'fzf.vim') | au! lazy_load
