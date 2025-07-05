@@ -1,7 +1,7 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  \\|//  leal @github  version 1.2507, since 1.0501
 "   o o   Thanks to Amix @github, MetaCosm, Sydney
-"    U    vim-plug rules, install git, fzf, ctags, ripgrep
+"    U    vim-plug rules, install git, fzf, ripgrep
 
 " => General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -15,14 +15,14 @@ if !has('nvim')
   set autoread          " auto read when a file is changed outside
   set hidden            " allow to change buffer w/o saving
 endif
-set clipboard+=unnamed  " use register '*' for all y, d, c, p ops
+set clipboard+=unnamed  " use register '*' for all y/d/c/p ops
 set isk+=$,%,#          " none of these should be word dividers
 set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
-set fencs=ucs-bom,utf-8,gb18030,gbk,gb2312,cp936
+set fencs=ucs-bom,utf-8,gb18030,gb2312,cp936
 set ffs=unix,dos        " behave good on diffrent os
-lan mes zh_CN.utf-8     " for encoding=utf-8
 set mouse=a             " except TERM screen, SecureCRT linux
+lan mes zh_CN.utf-8     " for encoding=utf-8
 set nowritebackup
 set noswapfile
 
@@ -61,7 +61,7 @@ Plug 'junegunn/vim-easy-align', { 'on': [] }
 Plug 'junegunn/fzf', { 'on': ['FZF'], 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim', { 'on': [] }
 Plug 'easymotion/vim-easymotion', { 'on': [] }
-call plug#end() " also execute filetype on and syntax enable
+call plug#end() " also exe filetype on and syntax enable
 
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -92,19 +92,17 @@ if has('gui_running')
   winpos 50 50 | set lines=38 columns=150
   colo molokai
 else
-  set showtabline=2     " always show the line
+  set showtabline=2     " always show
   set background=light  " before colo
   set termguicolors     " set t_Co=256?
   colo desert
 
-  highlight Normal guibg=NONE ctermbg=NONE
-  highlight NonText guibg=NONE ctermbg=NONE
+  hi Normal guibg=NONE ctermbg=NONE
+  hi NonText guibg=NONE ctermbg=NONE
 endif
 
-if v:version >= 700     " popmenu color settings
-  hi Pmenu guibg=#333333
-  hi PmenuSel guibg=#555555 guifg=#ffffff
-endif
+hi Pmenu guibg=#333333  " popup menu color, ver>=700
+hi PmenuSel guibg=#555555 guifg=#ffffff
 
 if v:version >= 900
   set wildoptions=pum   " possible completions in popup menu
@@ -114,17 +112,14 @@ set wig+=*.o,*.pyc      " the file patterns ignored in wildmenu
 set scrolloff=7         " minimal screen lines above/below cursor
 set ruler               " show current position along the bottom
 set shortmess=atI       " shorten to avoid 'press a key' prompt
-set report=0            " tell us when anything is changed via :...
-set fillchars=vert:\ ,stl:\ ,stlnc:\ 
-                        " make splitters between windows be blank
-set showmatch           " show matching paren when a bracket inserted
+set report=0            " report when anything is changed via ':'
+set fillchars=vert:\ ,  " make splitters between windows be blank
+set showmatch           " show matching one when a bracket inserted
 set ignorecase          " ignore the case of normal letters
 set hlsearch            " highlight all the searched phrases
 set incsearch           " highlight where the typed pattern matches
-map <silent> <leader><cr> :noh<cr>
-                        " remove the highlight searched phrases
-set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$
-                        " how :set list show
+set listchars=tab:\|-,trail:.,extends:>,precedes:<,eol:$
+map <silent> <leader><cr> :nohlsearch<cr>
 set cursorline
 
 " => Moving around
@@ -149,7 +144,7 @@ map <Right> :bn<cr>
 map <Left> :bp<cr>
 map <Down> <Esc>:Tlist<cr>
 
-" switch between windows
+" smart switch between windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
@@ -211,7 +206,7 @@ set switchbuf=usetab
 
 " => Text options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set sw=4 ts=4 sts=4      " tab spacing
+set sw=4 ts=4 sts=4      " tab spacing, unified
 set smarttab             " tab 'sw' in front of a line, else ts, sts
 set linebreak            " wrap long lines at a character in 'breakat'
 set textwidth=500        " maximum width of text being inserted
@@ -252,10 +247,10 @@ if has('win32') && has('gui_running')
   au VimEnter * call SetAlpha(210)
 endif
 
-augroup lazy_load | au!
+aug lazy_load | au!
   au InsertEnter * call plug#load('vim-airline-themes', 'vim-easymotion')
   au InsertEnter * call plug#load('vim-easy-align', 'YankRing.vim', 'fzf')
   au InsertEnter * call plug#load('supertab', 'fzf.vim') | au! lazy_load
-augroup end
+aug end
 
 " vim: set et ft=vim tw=78 ts=2 sw=2 tags+=$VIMRUNTIME/doc/tags:
