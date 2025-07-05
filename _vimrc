@@ -21,7 +21,7 @@ set confirm             " raise a confirm dialog for changed buffer
 set fenc=utf-8          " character encoding for file of the buffer
 set fencs=ucs-bom,utf-8,gb18030,gb2312,cp936
 set ffs=unix,dos        " behave good on diffrent os
-set mouse=a             " except TERM screen, SecureCRT linux
+set mouse=a             " except SecureCRT linux, screen
 lan mes zh_CN.utf-8     " for encoding=utf-8
 set nowritebackup
 set noswapfile
@@ -101,7 +101,7 @@ else
   hi NonText guibg=NONE ctermbg=NONE
 endif
 
-hi Pmenu guibg=#333333  " popup menu color, ver>=700
+hi Pmenu guibg=#333333  " popup menu color settings >=700
 hi PmenuSel guibg=#555555 guifg=#ffffff
 
 if v:version >= 900
@@ -119,7 +119,7 @@ set ignorecase          " ignore the case of normal letters
 set hlsearch            " highlight all the searched phrases
 set incsearch           " highlight where the typed pattern matches
 set listchars=tab:\|-,trail:.,extends:>,precedes:<,eol:$
-map <silent> <leader><cr> :nohlsearch<cr>
+map <silent> <leader><cr> :noh<cr>
 set cursorline
 
 " => Moving around
@@ -144,7 +144,7 @@ map <Right> :bn<cr>
 map <Left> :bp<cr>
 map <Down> <Esc>:Tlist<cr>
 
-" smart switch between windows
+" switch between windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
@@ -152,7 +152,7 @@ map <C-l> <C-W>l
 
 " => Cmdline settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" bash-like moving
+" tcsh-style keys
 cno <C-A> <Home>
 cno <C-F> <Right>
 cno <C-B> <Left>
@@ -187,7 +187,7 @@ map <C-Q> :$v
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 exe 'set viminfo+='.. (has('nvim') ? 'n~/.shada' : '!,n~/.viminfo')
 
-au BufReadPost * exe (line('''"') > 0 && line('''"') <= line('$')) ? 'norm `"' : 'norm $'
+au BufReadPost * exe line('''"') <= line('$') ? 'norm `"' : 'norm $'
 
 " don't close window when deleting a buffer
 map <leader>bd :call <SID>BufCloseIt()<cr>
